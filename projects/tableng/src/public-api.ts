@@ -21,3 +21,4 @@ export * from './lib/services/table-state.service';
 export * from './lib/components/table-header.component';
 export * from './lib/components/table-body.component';
 export * from './lib/components/table-cell.component';
+export * from './lib/components/table-row.component';
