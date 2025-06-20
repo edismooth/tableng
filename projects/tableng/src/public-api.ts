@@ -19,3 +19,4 @@ export * from './lib/services/table-state.service';
 
 // Components
 export * from './lib/components/table-header.component';
+export * from './lib/components/table-body.component';

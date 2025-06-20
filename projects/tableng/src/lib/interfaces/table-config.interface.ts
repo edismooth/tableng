@@ -2,58 +2,72 @@ import { ColumnDefinition } from './column-definition.interface';
 import { TableTheme } from './table-theme.interface';
 
 /**
- * Configuration for sticky columns behavior
+ * Configuration interface for sticky columns
+ * Defines which columns should remain fixed during horizontal scrolling
  */
 export interface StickyColumns {
-  /** Number of columns to stick to the left */
+  /** Number of columns to keep fixed on the left side */
   left?: number;
-  /** Number of columns to stick to the right */
+  /** Number of columns to keep fixed on the right side */
   right?: number;
 }
 
 /**
- * Main configuration interface for TableNG component
+ * Main configuration interface for table behavior and appearance
+ * Controls all aspects of table functionality including scrolling, editing, selection, and layout
  */
 export interface TableConfig {
-  /** Unique identifier for the table (used for localStorage persistence) */
+  /** Unique identifier for the table instance */
   tableId: string;
   
-  /** Column definitions for the table */
+  /** Array of column definitions that define table structure */
   columns: ColumnDefinition[];
   
-  /** Enable virtual scrolling for large datasets */
+  /** Enable virtual scrolling for performance with large datasets */
   virtualScrolling?: boolean;
   
-  /** Keep headers visible during vertical scrolling */
+  /** Keep headers visible when scrolling vertically */
   stickyHeaders?: boolean;
   
-  /** Configure sticky columns for horizontal scrolling */
+  /** Configuration for sticky columns during horizontal scrolling */
   stickyColumns?: StickyColumns;
   
-  /** Theme configuration (string name or theme object) */
-  theme?: string | TableTheme;
+  /** Theme configuration for visual customization */
+  theme?: TableTheme;
   
-  /** Enable inline editing capabilities */
+  /** Enable inline editing functionality */
   editable?: boolean;
   
-  /** Enable tree/hierarchical mode */
+  /** Enable row selection functionality */
+  selectable?: boolean;
+  
+  /** Enable tree/hierarchical mode for nested data */
   treeMode?: boolean;
   
-  /** Enable column filtering */
+  /** Enable filtering capabilities */
   filtering?: boolean;
   
-  /** Enable column sorting */
+  /** Enable sorting capabilities */
   sorting?: boolean;
   
   /** Enable column resizing */
   resizable?: boolean;
   
-  /** Enable column reordering via drag & drop */
+  /** Enable column reordering */
   reorderable?: boolean;
   
-  /** Default row height in pixels */
-  rowHeight?: number;
+  /** Custom CSS class to apply to the table */
+  cssClass?: string;
   
-  /** Header row height in pixels */
+  /** Fixed height for the table container (enables scrolling) */
+  height?: number;
+  
+  /** Fixed width for the table container */
+  width?: number;
+  
+  /** Height of table header in pixels */
   headerHeight?: number;
+  
+  /** Default height for data rows in pixels */
+  rowHeight?: number;
 } 
