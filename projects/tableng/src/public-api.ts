@@ -12,3 +12,7 @@ export * from './lib/interfaces/cell-edit-config.interface';
 export * from './lib/tableng.service';
 export * from './lib/tableng.component';
 export * from './lib/tableng.module';
+
+// Services
+export * from './lib/services/local-storage.service';
+export * from './lib/services/table-state.service';
