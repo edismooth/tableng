@@ -16,3 +16,6 @@ export * from './lib/tableng.module';
 // Services
 export * from './lib/services/local-storage.service';
 export * from './lib/services/table-state.service';
+
+// Components
+export * from './lib/components/table-header.component';
