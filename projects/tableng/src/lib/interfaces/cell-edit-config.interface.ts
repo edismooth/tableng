@@ -48,6 +48,9 @@ export interface CellEditConfig {
   /** Validation rules */
   validation?: ValidationRules;
   
+  /** Custom validator function that returns error message or null */
+  validator?: (value: unknown) => string | null;
+  
   /** Whether the editor is disabled */
   disabled?: boolean;
   
