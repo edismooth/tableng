@@ -1,315 +1,422 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { 
+  Component, 
+  Input, 
+  Output, 
+  EventEmitter, 
+  OnInit, 
+  OnDestroy, 
+  OnChanges,
+  SimpleChanges,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef
+} from '@angular/core';
+import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { TableConfig } from './interfaces/table-config.interface';
 import { ColumnDefinition } from './interfaces/column-definition.interface';
-import { TableStateService } from './services/table-state.service';
-import { LocalStorageService } from './services/local-storage.service';
+import { CellEditConfig } from './interfaces/cell-edit-config.interface';
+import { TableStateService, SortState, FilterState } from './services/table-state.service';
+import { LocalStorageService, TableState } from './services/local-storage.service';
 
-/**
- * Main table component that serves as the container for the entire table functionality
- * Handles data display, user interactions, and state management
- */
 @Component({
   selector: 'tng-tableng',
   template: `
-    <div class="tableng-container" [ngClass]="getContainerClasses()">
-      <!-- Loading State -->
-      <div *ngIf="loading" class="tableng-loading">
-        <div class="tableng-loading-spinner"></div>
-        <span class="tableng-loading-text">Loading table data...</span>
-      </div>
-
-      <!-- Main Table Content -->
-      <div class="tableng-table" [style.display]="loading ? 'none' : 'block'">
-        <!-- Empty State -->
-        <div *ngIf="!data || data.length === 0" class="tableng-empty">
-          <div class="tableng-empty-icon">📊</div>
-          <div class="tableng-empty-message">No data to display</div>
-        </div>
-
-        <!-- Table Header -->
-        <div *ngIf="data && data.length > 0" 
-             class="tableng-header" 
-             [ngClass]="getHeaderClasses()">
-          <div class="tableng-header-row">
-            <div *ngFor="let column of visibleColumns" 
-                 class="tableng-header-cell"
-                 [ngClass]="getHeaderCellClasses(column)">
-              {{ column.title }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Table Body -->
-        <div *ngIf="data && data.length > 0" 
-             class="tableng-body"
-             [ngClass]="getBodyClasses()">
-          <div *ngFor="let row of displayData; let i = index" 
-               class="tableng-body-row"
-               (click)="onRowClick(row)">
-            <div *ngFor="let column of visibleColumns" 
-                 class="tableng-body-cell">
-              {{ getCellValue(row, column) }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Virtual Scrolling Container -->
-        <div *ngIf="config?.virtualScrolling" class="tableng-virtual-scroll">
-          <!-- Virtual scrolling will be implemented in later phases -->
-        </div>
+    <div class="tableng-container" 
+         [class.tableng-virtual-scroll]="config?.virtualScrolling"
+         [class.tableng-theme-dark]="config?.theme?.name === 'dark'"
+         [class.tableng-theme-light]="config?.theme?.name === 'light'">
+      
+      <table class="tableng-table"
+             role="table"
+             tabindex="0"
+             [attr.aria-label]="config?.tableId || 'Data table'"
+             [class.tableng-sticky-header]="config?.stickyHeaders">
+        
+        <thead>
+          <tng-table-header
+            [columns]="visibleColumns"
+            [config]="config"
+            [sortState]="currentSortState"
+            [filterState]="currentFilterState"
+            (sortChange)="onSortChange($event)"
+            (filterChange)="onFilterChange($event)"
+            (columnResize)="onColumnResize($event)"
+            (columnReorder)="onColumnReorder($event)">
+          </tng-table-header>
+        </thead>
+        
+        <tbody>
+          <tng-table-body
+            [data]="filteredData"
+            [columns]="visibleColumns"
+            [config]="config"
+            [editConfigs]="editConfigs"
+            [selectedRows]="selectedRowsSet"
+            (rowClick)="onRowClick($event)"
+            (rowSelect)="onRowSelect($event)"
+            (cellChange)="onCellChange($event)">
+          </tng-table-body>
+        </tbody>
+      </table>
+      
+      <!-- Screen reader announcements -->
+      <div class="tableng-sr-announcer" aria-live="polite" aria-atomic="true">
+        {{ announcement }}
       </div>
     </div>
   `,
   styles: [`
     .tableng-container {
-      display: block;
+      position: relative;
       width: 100%;
       height: 100%;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .tableng-loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 200px;
-      color: #666;
-    }
-
-    .tableng-loading-spinner {
-      width: 24px;
-      height: 24px;
-      border: 2px solid #f3f3f3;
-      border-top: 2px solid #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 12px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .tableng-empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 200px;
-      color: #999;
-    }
-
-    .tableng-empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
+      overflow: auto;
+      background-color: var(--tableng-bg, white);
+      border: 1px solid var(--tableng-border, #e0e0e0);
+      border-radius: 4px;
     }
 
     .tableng-table {
       width: 100%;
-      height: 100%;
+      border-collapse: collapse;
+      background-color: inherit;
     }
 
-    .tableng-header {
-      background: #f8f9fa;
-      border-bottom: 2px solid #dee2e6;
+    .tableng-table:focus {
+      outline: 2px solid var(--tableng-primary, #007bff);
+      outline-offset: -2px;
     }
 
-    .tableng-sticky-header {
+    .tableng-sticky-header thead {
       position: sticky;
       top: 0;
       z-index: 10;
+      background-color: inherit;
     }
 
-    .tableng-header-row,
-    .tableng-body-row {
-      display: flex;
-      width: 100%;
+    .tableng-virtual-scroll {
+      overflow-y: auto;
+      height: 100%;
     }
 
-    .tableng-header-cell,
-    .tableng-body-cell {
-      flex: 1;
-      padding: 12px;
-      border-right: 1px solid #dee2e6;
+    /* Theme: Dark */
+    .tableng-theme-dark {
+      --tableng-bg: #1a1a1a;
+      --tableng-surface: #2a2a2a;
+      --tableng-text: #ffffff;
+      --tableng-text-secondary: #cccccc;
+      --tableng-border: #404040;
+      --tableng-hover: #3a3a3a;
+      --tableng-selected: #4a4a4a;
+      --tableng-primary: #007bff;
+      color: var(--tableng-text);
+    }
+
+    /* Theme: Light (default) */
+    .tableng-theme-light {
+      --tableng-bg: #ffffff;
+      --tableng-surface: #f8f9fa;
+      --tableng-text: #212529;
+      --tableng-text-secondary: #6c757d;
+      --tableng-border: #dee2e6;
+      --tableng-hover: #e9ecef;
+      --tableng-selected: #e7f3ff;
+      --tableng-primary: #007bff;
+    }
+
+    .tableng-sr-announcer {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
       overflow: hidden;
-      text-overflow: ellipsis;
+      clip: rect(0, 0, 0, 0);
       white-space: nowrap;
+      border: 0;
     }
-
-    .tableng-header-cell {
-      font-weight: 600;
-      color: #495057;
-    }
-
-    .tableng-body-row {
-      border-bottom: 1px solid #dee2e6;
-    }
-
-    .tableng-body-row:hover {
-      background-color: #f8f9fa;
-    }
-
-    .tableng-body-row:nth-child(even) {
-      background-color: #ffffff;
-    }
-
-    .tableng-body-row:nth-child(odd) {
-      background-color: #f9f9f9;
-    }
-  `]
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TablengComponent implements OnInit, OnDestroy, OnChanges {
-  // Input Properties
   @Input() config?: TableConfig;
   @Input() data?: any[];
-  @Input() loading: boolean = false;
+  @Input() editConfigs?: Record<string, CellEditConfig>;
 
-  // Output Events
   @Output() rowClick = new EventEmitter<any>();
+  @Output() rowSelect = new EventEmitter<any>();
   @Output() cellEdit = new EventEmitter<any>();
+  @Output() dataChange = new EventEmitter<any>();
   @Output() sortChange = new EventEmitter<any>();
   @Output() filterChange = new EventEmitter<any>();
-  @Output() columnReorder = new EventEmitter<any>();
   @Output() columnResize = new EventEmitter<any>();
+  @Output() columnReorder = new EventEmitter<any>();
 
-  // Component Properties
-  tableId?: string;
+  // Internal state
   visibleColumns: ColumnDefinition[] = [];
-  displayData: any[] = [];
-  subscriptions: Subscription[] = [];
-  hasStickyColumns: boolean = false;
+  filteredData: any[] = [];
+  selectedRows: any[] = [];
+  selectedRowsSet = new Set<any>();
+  currentSortState: SortState | null = null;
+  currentFilterState: FilterState = {};
+  announcement = '';
+
+  private destroy$ = new Subject<void>();
+  private saveState$ = new Subject<void>();
 
   constructor(
-    private tableStateService: TableStateService,
-    private localStorageService: LocalStorageService
+    private stateService: TableStateService,
+    private storageService: LocalStorageService,
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.initializeSubscriptions();
-  }
+    if (!this.config) return;
 
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-    this.subscriptions = [];
+    // Initialize state service
+    this.stateService.initializeTable(this.config, this.data || []);
+
+    // Load saved state if available
+    const savedState = this.storageService.loadTableState(this.config.tableId);
+    if (savedState) {
+      this.restoreState(savedState);
+    }
+
+    // Subscribe to state changes
+    this.subscribeToStateChanges();
+
+    // Setup auto-save with debounce
+    this.saveState$
+      .pipe(
+        debounceTime(500),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => this.saveCurrentState());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['config'] && this.config) {
-      this.tableId = this.config.tableId;
-      this.hasStickyColumns = !!(this.config.stickyColumns?.left || this.config.stickyColumns?.right);
-      this.tableStateService.initialize(this.config);
-      this.updateVisibleColumns();
+    if (changes['data'] && !changes['data'].firstChange) {
+      this.stateService.updateData(this.data || []);
     }
 
-    if (changes['data'] && this.data) {
-      this.tableStateService.setData(this.data);
-      this.updateDisplayData();
+    if (changes['config'] && !changes['config'].firstChange && this.config) {
+      this.updateConfig(this.config);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // Public API Methods
+  clearFilters(): void {
+    this.stateService.clearAllFilters();
+    this.announce('All filters cleared');
+  }
+
+  selectAll(): void {
+    this.selectedRows = [...this.filteredData];
+    this.selectedRowsSet = new Set(this.selectedRows);
+    this.cd.markForCheck();
+    this.announce(`All ${this.selectedRows.length} rows selected`);
+  }
+
+  deselectAll(): void {
+    this.selectedRows = [];
+    this.selectedRowsSet.clear();
+    this.cd.markForCheck();
+    this.announce('All rows deselected');
+  }
+
+  refresh(): void {
+    if (this.data) {
+      this.stateService.updateData(this.data);
+      this.announce('Table data refreshed');
+    }
+  }
+
+  resetState(): void {
+    if (!this.config) return;
+    
+    // Reset service state
+    this.stateService.initializeTable(this.config, this.data || []);
+    
+    // Clear stored state
+    this.storageService.removeTableState(this.config.tableId);
+    
+    // Reset local state
+    this.selectedRows = [];
+    this.selectedRowsSet.clear();
+    
+    this.cd.markForCheck();
+    this.announce('Table state reset to defaults');
+  }
+
+  exportToCSV(): string {
+    const headers = this.visibleColumns.map(col => col.title).join(',');
+    const rows = this.filteredData.map(row => 
+      this.visibleColumns.map(col => {
+        const value = row[col.key];
+        // Escape values containing commas or quotes
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          return `"${value.replace(/"/g, '""')}"`;
+        }
+        return value ?? '';
+      }).join(',')
+    ).join('\n');
+    
+    return `${headers}\n${rows}`;
   }
 
   // Event Handlers
-  onRowClick(rowData: any): void {
-    this.rowClick.emit(rowData);
+  onSortChange(event: any): void {
+    this.stateService.sortByColumn(event.column, event.direction);
+    this.sortChange.emit(event);
+    this.saveState$.next();
+    this.announce(`Sorted by ${event.column} ${event.direction}`);
   }
 
-  onCellEdit(editData: any): void {
-    this.cellEdit.emit(editData);
+  onFilterChange(event: any): void {
+    this.stateService.setColumnFilter(event.column, event.value);
+    this.filterChange.emit(event);
+    this.saveState$.next();
+    this.announce(`Filter applied to ${event.column}`);
   }
 
-  onSortChange(sortData: any): void {
-    this.sortChange.emit(sortData);
+  onColumnResize(event: any): void {
+    this.stateService.setColumnWidth(event.column, event.width);
+    this.columnResize.emit(event);
+    this.saveState$.next();
   }
 
-  onFilterChange(filterData: any): void {
-    this.filterChange.emit(filterData);
-  }
-
-  // Helper Methods
-  getContainerClasses(): string[] {
-    const classes = ['tableng-container'];
-    if (this.tableId) {
-      classes.push(`tableng-${this.tableId}`);
-    }
-    return classes;
-  }
-
-  getHeaderClasses(): string[] {
-    const classes = ['tableng-header'];
-    if (this.config?.stickyHeaders) {
-      classes.push('tableng-sticky-header');
-    }
-    return classes;
-  }
-
-  getHeaderCellClasses(column: ColumnDefinition): string[] {
-    const classes = ['tableng-header-cell'];
-    if (column.cssClass) {
-      classes.push(column.cssClass);
-    }
-    if (column.headerCssClass) {
-      classes.push(column.headerCssClass);
-    }
-    return classes;
-  }
-
-  getBodyClasses(): string[] {
-    const classes = ['tableng-body'];
-    if (this.config?.virtualScrolling) {
-      classes.push('tableng-virtual-scroll');
-    }
-    return classes;
-  }
-
-  getCellValue(row: any, column: ColumnDefinition): any {
-    const value = row[column.key];
+  onColumnReorder(event: any): void {
+    const currentOrder = this.stateService.getColumnOrder();
+    const newOrder = [...currentOrder];
+    const [removed] = newOrder.splice(event.from, 1);
+    newOrder.splice(event.to, 0, removed);
     
-    // Apply custom formatter if available
-    if (column.formatter && typeof column.formatter === 'function') {
-      return column.formatter(value, row, column);
+    this.stateService.reorderColumns(newOrder);
+    this.columnReorder.emit(event);
+    this.saveState$.next();
+    this.announce('Columns reordered');
+  }
+
+  onRowClick(event: any): void {
+    this.rowClick.emit(event);
+  }
+
+  onRowSelect(event: any): void {
+    if (event.selected) {
+      this.selectedRows.push(event.rowData);
+      this.selectedRowsSet.add(event.rowData);
+    } else {
+      const index = this.selectedRows.indexOf(event.rowData);
+      if (index > -1) {
+        this.selectedRows.splice(index, 1);
+        this.selectedRowsSet.delete(event.rowData);
+      }
     }
     
-    // Default formatting based on column type
-    switch (column.type) {
-      case 'boolean':
-        return value ? 'Yes' : 'No';
-      case 'date':
-        return value ? new Date(value).toLocaleDateString() : '';
-      case 'number':
-        return typeof value === 'number' ? value.toLocaleString() : value;
-      default:
-        return value || '';
-    }
+    this.rowSelect.emit(event);
+    this.cd.markForCheck();
+    this.announce(`Row ${event.selected ? 'selected' : 'deselected'}`);
   }
 
-  private initializeSubscriptions(): void {
-    // Subscribe to data changes
-    if (this.tableStateService.data$) {
-      const dataSub = this.tableStateService.data$.subscribe(data => {
-        this.displayData = data || [];
-      });
-      this.subscriptions.push(dataSub);
+  onCellChange(event: any): void {
+    // Update data
+    if (this.data && event.rowIndex >= 0 && event.rowIndex < this.data.length) {
+      this.data[event.rowIndex][event.column] = event.newValue;
     }
+    
+    this.cellEdit.emit(event);
+    this.dataChange.emit({
+      data: this.data,
+      change: event
+    });
+    
+    this.announce(`Cell updated in ${event.column}`);
+  }
 
-    // Subscribe to column changes
-    if (this.tableStateService.columns$) {
-      const columnsSub = this.tableStateService.columns$.subscribe(columns => {
-        this.updateVisibleColumns();
+  // Private Methods
+  private subscribeToStateChanges(): void {
+    // Subscribe to visible data changes
+    this.stateService.visibleData$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        this.filteredData = data;
+        this.cd.markForCheck();
       });
-      this.subscriptions.push(columnsSub);
-    }
+
+    // Subscribe to sort state changes
+    this.stateService.sortState$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(state => {
+        this.currentSortState = state;
+        this.cd.markForCheck();
+      });
+
+    // Subscribe to filter state changes
+    this.stateService.filterState$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(state => {
+        this.currentFilterState = state;
+        this.cd.markForCheck();
+      });
+
+    // Update visible columns
+    this.updateVisibleColumns();
   }
 
   private updateVisibleColumns(): void {
-    if (this.config?.columns) {
-      this.visibleColumns = this.config.columns.filter(column => column.visible !== false);
-    }
+    if (!this.config) return;
+    
+    const columnOrder = this.stateService.getColumnOrder();
+    const columnWidths = this.stateService.getColumnWidths();
+    
+    // Reorder and update column widths
+    this.visibleColumns = columnOrder
+      .map(key => this.config!.columns.find(col => col.key === key))
+      .filter((col): col is ColumnDefinition => col !== undefined && col.visible !== false)
+      .map(col => ({
+        ...col,
+        width: columnWidths[col.key] || col.width
+      }));
   }
 
-  private updateDisplayData(): void {
-    this.displayData = this.data || [];
+  private restoreState(state: TableState): void {
+    // State restoration is handled by the state service
+    // Just update our local view
+    this.updateVisibleColumns();
+  }
+
+  private saveCurrentState(): void {
+    if (!this.config) return;
+    
+    const state: Partial<TableState> = {
+      config: this.config,
+      columnOrder: this.stateService.getColumnOrder(),
+      columnWidths: this.stateService.getColumnWidths(),
+      sortState: this.stateService.getSortState(),
+      filterState: this.stateService.getFilterState()
+    };
+    
+    this.storageService.saveTableState(this.config.tableId, state);
+  }
+
+  private updateConfig(config: TableConfig): void {
+    // Update service with new config
+    this.stateService.initializeTable(config, this.data || []);
+    this.updateVisibleColumns();
+  }
+
+  private announce(message: string): void {
+    this.announcement = message;
+    this.cd.markForCheck();
+    
+    // Clear announcement after a delay
+    setTimeout(() => {
+      this.announcement = '';
+      this.cd.markForCheck();
+    }, 1000);
   }
 }

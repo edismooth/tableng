@@ -33,7 +33,7 @@ export interface TableConfig {
   stickyColumns?: StickyColumns;
   
   /** Theme configuration for visual customization */
-  theme?: TableTheme;
+  theme?: TableTheme | string;
   
   /** Enable inline editing functionality */
   editable?: boolean;

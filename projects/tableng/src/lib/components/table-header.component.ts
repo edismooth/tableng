@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ColumnDefinition, SortDirection } from '../interfaces/column-definition.interface';
 import { TableConfig } from '../interfaces/table-config.interface';
-import { SortState } from '../services/table-state.service';
+import { SortState, FilterState } from '../services/table-state.service';
 
 /**
  * Table header component that handles column headers, sorting, filtering, and resizing
@@ -43,6 +43,7 @@ import { SortState } from '../services/table-state.service';
             <input type="text" 
                    class="tableng-filter-input"
                    [placeholder]="'Filter ' + column.title"
+                   [value]="getFilterValue(column.key)"
                    [attr.aria-label]="'Filter by ' + column.title"
                    (input)="onFilterChange($event, column)"
                    (click)="$event.stopPropagation()">
@@ -190,6 +191,7 @@ export class TableHeaderComponent {
   @Input() columns: ColumnDefinition[] = [];
   @Input() config?: TableConfig | null;
   @Input() sortState?: SortState;
+  @Input() filterState?: FilterState;
   @Input() stickyHeader = false;
 
   @Output() sortChange = new EventEmitter<{ column: string; direction: SortDirection }>();
@@ -367,5 +369,12 @@ export class TableHeaderComponent {
     }
 
     return 'none';
+  }
+
+  /**
+   * Get current filter value for a column
+   */
+  getFilterValue(columnKey: string): string {
+    return this.filterState?.[columnKey] || '';
   }
 } 

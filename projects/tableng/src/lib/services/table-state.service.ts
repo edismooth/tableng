@@ -115,7 +115,6 @@ export class TableStateService {
    */
   reorderColumns(newOrder: string[]): void {
     this.columnOrder = [...newOrder];
-    this.saveCurrentState();
   }
 
   /**
@@ -130,7 +129,6 @@ export class TableStateService {
    */
   setColumnWidth(columnKey: string, width: number): void {
     this.columnWidths[columnKey] = width;
-    this.saveCurrentState();
   }
 
   /**
@@ -167,7 +165,6 @@ export class TableStateService {
     
     this.sortStateSubject.next(this.currentSort);
     this.applyFiltersAndSorting();
-    this.saveCurrentState();
   }
 
   /**
@@ -205,7 +202,6 @@ export class TableStateService {
     
     this.filterStateSubject.next({ ...this.currentFilters });
     this.applyFiltersAndSorting();
-    this.saveCurrentState();
   }
 
   /**
@@ -215,7 +211,6 @@ export class TableStateService {
     delete this.currentFilters[columnKey];
     this.filterStateSubject.next({ ...this.currentFilters });
     this.applyFiltersAndSorting();
-    this.saveCurrentState();
   }
 
   /**
@@ -225,7 +220,6 @@ export class TableStateService {
     this.currentFilters = {};
     this.filterStateSubject.next({});
     this.applyFiltersAndSorting();
-    this.saveCurrentState();
   }
 
   /**
@@ -321,22 +315,5 @@ export class TableStateService {
       this.currentFilters = state.filterState;
       this.filterStateSubject.next(this.currentFilters);
     }
-  }
-
-  /**
-   * Save current state to localStorage
-   */
-  private saveCurrentState(): void {
-    if (!this.currentConfig) return;
-
-    const state: Partial<TableState> = {
-      config: this.currentConfig,
-      columnOrder: this.columnOrder,
-      columnWidths: this.columnWidths,
-      sortState: this.currentSort,
-      filterState: this.currentFilters
-    };
-
-    this.localStorageService.saveTableState(this.currentConfig.tableId, state);
   }
 } 

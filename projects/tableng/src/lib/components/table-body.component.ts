@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ColumnDefinition } from '../interfaces/column-definition.interface';
 import { TableConfig } from '../interfaces/table-config.interface';
+import { CellEditConfig } from '../interfaces/cell-edit-config.interface';
 
 /**
  * Interface for virtual scrolling configuration
@@ -333,8 +334,9 @@ export class TableBodyComponent {
   @Input() columns: ColumnDefinition[] = [];
   @Input() data: unknown[] = [];
   @Input() config?: TableConfig | null;
+  @Input() editConfigs?: Record<string, CellEditConfig>;
   @Input() loading = false;
-  @Input() selectedRows: unknown[] = [];
+  @Input() selectedRows: Set<unknown> | unknown[] = [];
   @Input() emptyMessage?: string;
   @Input() virtualScrollConfig?: VirtualScrollConfig;
 
@@ -462,7 +464,10 @@ export class TableBodyComponent {
   }
 
   isRowSelected(rowData: unknown): boolean {
-    return this.selectedRows.includes(rowData);
+    if (this.selectedRows instanceof Set) {
+      return this.selectedRows.has(rowData);
+    }
+    return Array.isArray(this.selectedRows) && this.selectedRows.includes(rowData);
   }
 
   getCellValue(rowData: unknown, column: ColumnDefinition): unknown {

@@ -7,7 +7,7 @@ import { ColumnDefinition } from '../interfaces/column-definition.interface';
 
 describe('TableStateService', () => {
   let service: TableStateService;
-  let mockLocalStorageService: jasmine.SpyObj<LocalStorageService>;
+  let mockLocalStorageService: jest.Mocked<LocalStorageService>;
 
   const mockTableConfig: TableConfig = {
     tableId: 'test-table',
@@ -32,9 +32,16 @@ describe('TableStateService', () => {
 
   beforeEach(() => {
     const localStorageSpy = {
-      saveTableState: () => {},
-      loadTableState: () => null,
-      hasTableState: () => false
+      saveTableState: jest.fn(),
+      loadTableState: jest.fn().mockReturnValue(null),
+      hasTableState: jest.fn().mockReturnValue(false),
+      removeTableState: jest.fn(),
+      clearAllTableStates: jest.fn(),
+      getAllTableStates: jest.fn().mockReturnValue({}),
+      exportTableStates: jest.fn().mockReturnValue('{}'),
+      importTableStates: jest.fn(),
+      getStorageSize: jest.fn().mockReturnValue(0),
+      clearExpiredStates: jest.fn()
     };
 
     TestBed.configureTestingModule({
@@ -45,12 +52,7 @@ describe('TableStateService', () => {
     });
 
     service = TestBed.inject(TableStateService);
-    mockLocalStorageService = TestBed.inject(LocalStorageService) as any;
-    
-    // Setup spies after injection
-    mockLocalStorageService.saveTableState = () => {};
-    mockLocalStorageService.loadTableState = () => null;
-    mockLocalStorageService.hasTableState = () => false;
+    mockLocalStorageService = TestBed.inject(LocalStorageService) as jest.Mocked<LocalStorageService>;
   });
 
   it('should be created', () => {
@@ -73,7 +75,7 @@ describe('TableStateService', () => {
         columnWidths: { id: 150, name: 250 },
         sortState: { column: 'name', direction: 'asc' as const }
       };
-      mockLocalStorageService.loadTableState = () => persistedState;
+      mockLocalStorageService.loadTableState.mockReturnValue(persistedState);
 
       service.initializeTable(mockTableConfig, mockData);
 
