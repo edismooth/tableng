@@ -1,0 +1,56 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm",
+    "schematicCollections": [
+      "angular-eslint"
+    ]
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "tableng": {
+      "projectType": "library",
+      "root": "projects/tableng",
+      "sourceRoot": "projects/tableng/src",
+      "prefix": "tng",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/tableng/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/tableng/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/tableng/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/tableng/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/tableng/**/*.ts",
+              "projects/tableng/**/*.html"
+            ],
+            "eslintConfig": "projects/tableng/eslint.config.js"
+          }
+        }
+      }
+    }
+  }
+}
