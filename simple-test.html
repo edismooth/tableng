@@ -620,6 +620,16 @@
                 const draggedIndex = parseInt(draggedElement.dataset.columnIndex);
                 const targetIndex = parseInt(this.dataset.columnIndex);
                 
+                // Capture current column widths before reordering
+                const currentWidths = {};
+                const headers = document.querySelectorAll('#headerRow th');
+                headers.forEach(header => {
+                    const colIndex = parseInt(header.dataset.columnIndex);
+                    const computedStyle = window.getComputedStyle(header);
+                    const width = header.style.minWidth || computedStyle.width;
+                    currentWidths[colIndex] = width;
+                });
+                
                 // Reorder columns
                 const draggedColOrder = columnOrder.indexOf(draggedIndex);
                 const targetColOrder = columnOrder.indexOf(targetIndex);
@@ -633,8 +643,14 @@
                 setupDragAndDrop();
                 setupResize();
                 
-                // Save new column order
+                // Reapply preserved column widths
+                applyColumnWidths(currentWidths);
+                
+                // Save new column order with preserved widths
                 saveTableState();
+                
+                // Show brief feedback that widths were preserved
+                console.log('Column widths preserved during reordering:', currentWidths);
             }
 
             return false;
@@ -810,6 +826,18 @@
         }
 
         function resetTable() {
+            // Capture current widths before reset
+            const currentWidths = {};
+            const headers = document.querySelectorAll('#headerRow th');
+            headers.forEach(header => {
+                const colIndex = parseInt(header.dataset.columnIndex);
+                const computedStyle = window.getComputedStyle(header);
+                const width = header.style.minWidth || computedStyle.width;
+                if (width && width !== 'auto') {
+                    currentWidths[colIndex] = width;
+                }
+            });
+            
             columnOrder = columns.map((_, index) => index);
             sortStates = new Array(columns.length).fill(0);
             originalData = generateData(currentDataSize);
@@ -818,6 +846,11 @@
             renderTable();
             setupDragAndDrop();
             setupResize();
+            
+            // Reapply any custom widths that were set
+            if (Object.keys(currentWidths).length > 0) {
+                applyColumnWidths(currentWidths);
+            }
         }
 
         function randomizeData() {
@@ -929,7 +962,10 @@ export class AppComponent {
             
             headers.forEach((header, index) => {
                 const colIndex = parseInt(header.dataset.columnIndex);
-                const width = header.style.minWidth || '120px';
+                const computedStyle = window.getComputedStyle(header);
+                // Use minWidth if set, otherwise use computed width, fallback to default
+                const width = header.style.minWidth || 
+                             (computedStyle.width !== 'auto' ? computedStyle.width : '120px');
                 columnWidths[colIndex] = width;
             });
 
@@ -1028,15 +1064,24 @@ export class AppComponent {
 
         // Apply saved column widths
         function applyColumnWidths(columnWidths) {
-            setTimeout(() => {
+            // Apply immediately for reordering scenarios
+            const applyWidths = () => {
                 const headers = document.querySelectorAll('#headerRow th');
                 headers.forEach(header => {
                     const colIndex = parseInt(header.dataset.columnIndex);
                     if (columnWidths[colIndex]) {
                         header.style.minWidth = columnWidths[colIndex];
+                        // Also set width to ensure it takes effect
+                        header.style.width = columnWidths[colIndex];
                     }
                 });
-            }, 100); // Small delay to ensure DOM is ready
+            };
+            
+            // Apply immediately
+            applyWidths();
+            
+            // Also apply after a small delay to ensure DOM is fully ready
+            setTimeout(applyWidths, 50);
         }
 
         // Apply saved sort states
