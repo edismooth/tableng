@@ -89,6 +89,15 @@
             cursor: pointer;
             user-select: none;
             z-index: 10;
+            transition: background-color 0.15s ease, transform 0.15s ease;
+        }
+        
+        .mock-table th[draggable="true"]:hover {
+            cursor: grab;
+        }
+        
+        .mock-table th[draggable="true"]:active {
+            cursor: grabbing;
         }
         
         .mock-table th:hover {
@@ -139,15 +148,27 @@
             background: linear-gradient(to right, transparent 1px, #0056b3 1px, #0056b3 5px, transparent 5px);
         }
         
-        /* Drag and Drop Styles */
+        /* Enhanced Drag and Drop Styles */
         .mock-table th.dragging {
-            opacity: 0.5;
-            background-color: #ffc107;
+            opacity: 0.8;
+            background-color: #ffc107 !important;
+            color: #212529 !important;
+            transform: scale(1.02) rotate(1deg);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+            z-index: 1000;
+            transition: none !important;
+            border: 2px solid #e0a800;
         }
         
         .mock-table th.drag-over {
-            background-color: #28a745;
-            color: white;
+            background-color: #28a745 !important;
+            color: white !important;
+            transition: background-color 0.1s ease !important;
+        }
+        
+        .mock-table th.drag-over:hover {
+            background-color: #28a745 !important;
+            color: white !important;
         }
         
         .drag-indicator {
@@ -155,14 +176,25 @@
             left: 0;
             top: 0;
             bottom: 0;
-            width: 3px;
+            width: 4px;
             background: #28a745;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.1s ease;
+            z-index: 1001;
         }
         
         .mock-table th.drag-over .drag-indicator {
             opacity: 1;
+        }
+        
+        /* Prevent hover effects during drag */
+        .mock-table.dragging-active th:hover {
+            background-color: inherit !important;
+        }
+        
+        .mock-table.dragging-active th.drag-over:hover {
+            background-color: #28a745 !important;
+            color: white !important;
         }
         
         .status-indicator {
@@ -589,8 +621,16 @@
         function handleDragStart(e) {
             draggedElement = this;
             this.classList.add('dragging');
+            
+            // Add dragging-active class to table to prevent hover conflicts
+            const table = document.querySelector('.mock-table');
+            table.classList.add('dragging-active');
+            
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/html', this.outerHTML);
+            
+            // Add visual feedback
+            this.style.cursor = 'grabbing';
         }
 
         function handleDragOver(e) {
@@ -602,13 +642,26 @@
         }
 
         function handleDragEnter(e) {
+            e.preventDefault();
             if (this !== draggedElement) {
+                // Remove drag-over from other headers
+                const headers = document.querySelectorAll('#headerRow th');
+                headers.forEach(header => {
+                    if (header !== this && header !== draggedElement) {
+                        header.classList.remove('drag-over');
+                    }
+                });
+                
                 this.classList.add('drag-over');
             }
         }
 
         function handleDragLeave(e) {
-            this.classList.remove('drag-over');
+            // Only remove drag-over if we're actually leaving the element
+            // and not entering a child element
+            if (!this.contains(e.relatedTarget)) {
+                this.classList.remove('drag-over');
+            }
         }
 
         function handleDrop(e) {
@@ -657,10 +710,18 @@
         }
 
         function handleDragEnd(e) {
+            const table = document.querySelector('.mock-table');
             const headers = document.querySelectorAll('#headerRow th');
+            
+            // Clean up all drag states
+            table.classList.remove('dragging-active');
             headers.forEach(header => {
                 header.classList.remove('dragging', 'drag-over');
+                header.style.cursor = '';
             });
+            
+            // Reset dragged element reference
+            draggedElement = null;
         }
 
         function setupResize() {
