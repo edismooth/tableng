@@ -311,7 +311,9 @@
                 <li><strong>Column Reordering:</strong> Drag column headers to reorder (drag from header text, not borders)</li>
                 <li><strong>Row Selection:</strong> Click rows to select them (blue highlight)</li>
                 <li><strong>Scrolling:</strong> Use scrollbars to navigate through 100 rows and 20 columns</li>
+                <li><strong>State Persistence:</strong> All changes are auto-saved to localStorage and restored on page reload</li>
             </ul>
+            <p><em>💡 Try reordering columns, resizing them, or changing sort order, then reload the page to see persistence in action!</em></p>
         </div>
 
         <h2>🎯 Key Features Implemented</h2>
@@ -346,7 +348,7 @@
             </div>
             <div class="feature-item">
                 <h4>💾 State Persistence</h4>
-                <p>localStorage integration with debounced saving</p>
+                <p>Auto-save column order, sizes, sort states, and preferences to localStorage</p>
             </div>
         </div>
 
@@ -364,6 +366,18 @@
             </button>
             <button class="demo-button secondary" onclick="showAccessibilityTest()">
                 ♿ Accessibility Test
+            </button>
+        </div>
+
+        <div class="demo-controls">
+            <button class="demo-button secondary" onclick="showStateInfo()">
+                💾 Show Saved State
+            </button>
+            <button class="demo-button secondary" onclick="clearTableState()">
+                🗑️ Clear Saved State
+            </button>
+            <button class="demo-button secondary" onclick="location.reload()">
+                🔄 Reload Page
             </button>
         </div>
 
@@ -492,9 +506,16 @@
         }
 
         function initializeTable() {
-            // Initialize column order and sort states
-            columnOrder = columns.map((_, index) => index);
-            sortStates = new Array(columns.length).fill(0);
+            // Load saved state or initialize defaults
+            const savedColumnWidths = loadTableState();
+            
+            // Initialize defaults if no saved state
+            if (columnOrder.length === 0) {
+                columnOrder = columns.map((_, index) => index);
+            }
+            if (sortStates.length === 0) {
+                sortStates = new Array(columns.length).fill(0);
+            }
             
             // Generate initial data
             originalData = generateData(currentDataSize);
@@ -505,6 +526,12 @@
             renderTable();
             setupDragAndDrop();
             setupResize();
+            
+            // Apply saved column widths
+            applyColumnWidths(savedColumnWidths);
+            
+            // Apply saved sort states
+            applySavedSortStates();
         }
 
         function createHeaders() {
@@ -605,6 +632,9 @@
                 renderTable();
                 setupDragAndDrop();
                 setupResize();
+                
+                // Save new column order
+                saveTableState();
             }
 
             return false;
@@ -639,6 +669,9 @@
             function stopResize() {
                 document.removeEventListener('mousemove', doResize);
                 document.removeEventListener('mouseup', stopResize);
+                
+                // Save column width changes
+                saveTableState();
             }
 
             document.addEventListener('mousemove', doResize);
@@ -690,6 +723,9 @@
             }
             
             renderTable();
+            
+            // Save sort state changes
+            saveTableState();
         }
 
         function filterTable(columnIndex, filterValue) {
@@ -768,6 +804,9 @@
             originalData = generateData(currentDataSize);
             filteredData = [...originalData];
             renderTable();
+            
+            // Save data size preference
+            saveTableState();
         }
 
         function resetTable() {
@@ -876,6 +915,215 @@ export class AppComponent {
                     <p><strong>Focus Management:</strong> ✅ Visible focus indicators</p>
                     <p><strong>Color Contrast:</strong> ✅ WCAG AA compliant</p>
                     <p><em>All accessibility requirements met.</em></p>
+                </div>
+            `;
+        }
+
+        // Storage key for persistence
+        const STORAGE_KEY = 'tableng_demo_state';
+
+        // Save table state to localStorage
+        function saveTableState() {
+            const columnWidths = {};
+            const headers = document.querySelectorAll('#headerRow th');
+            
+            headers.forEach((header, index) => {
+                const colIndex = parseInt(header.dataset.columnIndex);
+                const width = header.style.minWidth || '120px';
+                columnWidths[colIndex] = width;
+            });
+
+            const state = {
+                columnOrder: [...columnOrder],
+                columnWidths: columnWidths,
+                sortStates: [...sortStates],
+                dataSize: currentDataSize,
+                timestamp: Date.now()
+            };
+
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                console.log('Table state saved:', state);
+                
+                // Show brief save indicator
+                showSaveIndicator();
+            } catch (error) {
+                console.warn('Failed to save table state:', error);
+            }
+        }
+
+        // Show save indicator
+        function showSaveIndicator() {
+            // Remove existing indicator
+            const existing = document.querySelector('.save-indicator');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Create new indicator
+            const indicator = document.createElement('div');
+            indicator.className = 'save-indicator';
+            indicator.innerHTML = '💾 State Saved';
+            indicator.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-size: 14px;
+                z-index: 1000;
+                opacity: 1;
+                transition: opacity 0.3s ease;
+            `;
+            
+            document.body.appendChild(indicator);
+            
+            // Fade out after 2 seconds
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+                setTimeout(() => {
+                    if (indicator.parentNode) {
+                        indicator.parentNode.removeChild(indicator);
+                    }
+                }, 300);
+            }, 2000);
+        }
+
+        // Load table state from localStorage
+        function loadTableState() {
+            try {
+                const savedState = localStorage.getItem(STORAGE_KEY);
+                if (savedState) {
+                    const state = JSON.parse(savedState);
+                    console.log('Table state loaded:', state);
+                    
+                    // Restore column order
+                    if (state.columnOrder && state.columnOrder.length === columns.length) {
+                        columnOrder = [...state.columnOrder];
+                    }
+                    
+                    // Restore sort states
+                    if (state.sortStates && state.sortStates.length === columns.length) {
+                        sortStates = [...state.sortStates];
+                    }
+                    
+                    // Restore data size
+                    if (state.dataSize) {
+                        currentDataSize = state.dataSize;
+                        const sizeSelect = document.getElementById('dataSizeSelect');
+                        if (sizeSelect) {
+                            sizeSelect.value = currentDataSize.toString();
+                        }
+                    }
+                    
+                    return state.columnWidths || {};
+                }
+            } catch (error) {
+                console.warn('Failed to load table state:', error);
+            }
+            return {};
+        }
+
+        // Apply saved column widths
+        function applyColumnWidths(columnWidths) {
+            setTimeout(() => {
+                const headers = document.querySelectorAll('#headerRow th');
+                headers.forEach(header => {
+                    const colIndex = parseInt(header.dataset.columnIndex);
+                    if (columnWidths[colIndex]) {
+                        header.style.minWidth = columnWidths[colIndex];
+                    }
+                });
+            }, 100); // Small delay to ensure DOM is ready
+        }
+
+        // Apply saved sort states
+        function applySavedSortStates() {
+            setTimeout(() => {
+                sortStates.forEach((state, colIndex) => {
+                    if (state !== 0) {
+                        const indicator = document.getElementById(`sort-${colIndex}`);
+                        if (indicator) {
+                            indicator.textContent = state === 1 ? '▲' : '▼';
+                        }
+                    }
+                });
+                
+                // Apply sorting if any column is sorted
+                const sortedColumn = sortStates.findIndex(state => state !== 0);
+                if (sortedColumn !== -1) {
+                    applySorting(sortedColumn, sortStates[sortedColumn]);
+                }
+            }, 150);
+        }
+
+        // Apply sorting without changing sort state
+        function applySorting(columnIndex, sortDirection) {
+            const column = columns[columnIndex];
+            
+            if (sortDirection === 1) {
+                filteredData.sort((a, b) => {
+                    const aVal = a[column.key];
+                    const bVal = b[column.key];
+                    
+                    if (column.type === 'number') {
+                        return parseFloat(aVal) - parseFloat(bVal);
+                    }
+                    return aVal.toString().localeCompare(bVal.toString());
+                });
+            } else if (sortDirection === 2) {
+                filteredData.sort((a, b) => {
+                    const aVal = a[column.key];
+                    const bVal = b[column.key];
+                    
+                    if (column.type === 'number') {
+                        return parseFloat(bVal) - parseFloat(aVal);
+                    }
+                    return bVal.toString().localeCompare(aVal.toString());
+                });
+            }
+            
+            renderTable();
+        }
+
+        // Clear saved state
+        function clearTableState() {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+                console.log('Table state cleared');
+                
+                // Show confirmation
+                const output = document.getElementById('test-output');
+                output.innerHTML = `
+                    <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 4px;">
+                        <h3>🗑️ State Cleared</h3>
+                        <p>All saved column positions, sizes, and preferences have been cleared.</p>
+                        <p><em>Reload the page to see the default layout.</em></p>
+                    </div>
+                `;
+            } catch (error) {
+                console.warn('Failed to clear table state:', error);
+            }
+        }
+
+        // Show current state info
+        function showStateInfo() {
+            const state = loadTableState();
+            const hasState = Object.keys(state).length > 0;
+            
+            const output = document.getElementById('test-output');
+            output.innerHTML = `
+                <div style="background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; padding: 15px; border-radius: 4px;">
+                    <h3>💾 Current State Information</h3>
+                    <p><strong>State Saved:</strong> ${hasState ? '✅ Yes' : '❌ No'}</p>
+                    ${hasState ? `
+                        <p><strong>Column Order:</strong> ${columnOrder.map(i => columns[i].title).join(' → ')}</p>
+                        <p><strong>Data Size:</strong> ${currentDataSize} rows</p>
+                        <p><strong>Sort States:</strong> ${sortStates.some(s => s !== 0) ? 'Active' : 'None'}</p>
+                        <p><strong>Custom Widths:</strong> ${Object.keys(state).length > 0 ? 'Applied' : 'Default'}</p>
+                    ` : '<p><em>No saved state found. Current layout will be saved automatically.</em></p>'}
                 </div>
             `;
         }
