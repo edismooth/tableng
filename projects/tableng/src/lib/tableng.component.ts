@@ -22,8 +22,9 @@ import { LocalStorageService, TableState } from './services/local-storage.servic
   template: `
     <div class="tableng-container" 
          [class.tableng-virtual-scroll]="config?.virtualScrolling"
-         [class.tableng-theme-dark]="config?.theme?.name === 'dark'"
-         [class.tableng-theme-light]="config?.theme?.name === 'light'">
+         [class.tableng-theme-dark]="getThemeName() === 'dark'"
+         [class.tableng-theme-light]="getThemeName() === 'light'"
+         [class.tableng-loading]="loading">
       
       <table class="tableng-table"
              role="table"
@@ -141,6 +142,7 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
   @Input() config?: TableConfig;
   @Input() data?: any[];
   @Input() editConfigs?: Record<string, CellEditConfig>;
+  @Input() loading?: boolean;
 
   @Output() rowClick = new EventEmitter<any>();
   @Output() rowSelect = new EventEmitter<any>();
@@ -156,7 +158,7 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
   filteredData: any[] = [];
   selectedRows: any[] = [];
   selectedRowsSet = new Set<any>();
-  currentSortState: SortState | null = null;
+
   currentFilterState: FilterState = {};
   announcement = '';
 
@@ -418,5 +420,19 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
       this.announcement = '';
       this.cd.markForCheck();
     }, 1000);
+  }
+
+  getThemeName(): string | undefined {
+    if (!this.config?.theme) return undefined;
+    
+    if (typeof this.config.theme === 'string') {
+      return this.config.theme;
+    }
+    
+    return this.config.theme.name;
+  }
+
+  get currentSortState(): SortState | undefined {
+    return this.stateService.getSortState() || undefined;
   }
 }
