@@ -1,7 +1,7 @@
 <div class="tableng-cell"
      [class.tableng-cell-editable]="editable && !editConfig?.readonly && !editConfig?.disabled"
      [class.tableng-cell-editing]="isEditing"
-     [class.tableng-cell-error]="validationError"
+     [class.tableng-cell-error]="cellControl.invalid && cellControl.touched"
      role="gridcell"
      tabindex="0"
      (dblclick)="onDoubleClick()"
@@ -33,13 +33,8 @@
            #editInput
            type="text"
            class="tableng-input"
-           [class.tableng-input-error]="validationError"
-           [value]="editValue"
-           [disabled]="editConfig?.disabled"
-           [readonly]="editConfig?.readonly"
-           [required]="editConfig?.required"
+           [formControl]="cellControl"
            [attr.aria-label]="'Edit ' + column?.title"
-           (input)="onInputChange($event)"
            (keydown)="onEditKeyDown($event)"
            (blur)="onBlur()" />
     
@@ -48,13 +43,8 @@
            #editInput
            type="number"
            class="tableng-input"
-           [class.tableng-input-error]="validationError"
-           [value]="editValue"
-           [disabled]="editConfig?.disabled"
-           [readonly]="editConfig?.readonly"
-           [required]="editConfig?.required"
+           [formControl]="cellControl"
            [attr.aria-label]="'Edit ' + column?.title"
-           (input)="onInputChange($event)"
            (keydown)="onEditKeyDown($event)"
            (blur)="onBlur()" />
     
@@ -63,13 +53,8 @@
            #editInput
            type="date"
            class="tableng-input"
-           [class.tableng-input-error]="validationError"
-           [value]="getDateInputValue()"
-           [disabled]="editConfig?.disabled"
-           [readonly]="editConfig?.readonly"
-           [required]="editConfig?.required"
+           [formControl]="cellControl"
            [attr.aria-label]="'Edit ' + column?.title"
-           (input)="onInputChange($event)"
            (keydown)="onEditKeyDown($event)"
            (blur)="onBlur()" />
     
@@ -77,12 +62,8 @@
     <select *ngIf="getEditType() === 'select'"
             #editInput
             class="tableng-select"
-            [class.tableng-input-error]="validationError"
-            [value]="editValue"
-            [disabled]="editConfig?.disabled"
-            [required]="editConfig?.required"
+            [formControl]="cellControl"
             [attr.aria-label]="'Edit ' + column?.title"
-            (change)="onSelectChange($event)"
             (keydown)="onEditKeyDown($event)"
             (blur)="onBlur()">
       <option *ngFor="let option of editConfig?.options" [value]="option.value">
@@ -95,10 +76,8 @@
            #editInput
            type="checkbox"
            class="tableng-checkbox"
-           [checked]="editValue"
-           [disabled]="editConfig?.disabled"
+           [formControl]="cellControl"
            [attr.aria-label]="'Edit ' + column?.title"
-           (change)="onCheckboxChange($event)"
            (keydown)="onEditKeyDown($event)"
            (blur)="onBlur()" />
     
@@ -110,7 +89,7 @@
     </div>
     
     <!-- Validation Error -->
-    <div *ngIf="validationError" 
+    <div *ngIf="cellControl.invalid && cellControl.touched"
          class="tableng-validation-error"
          role="alert"
          aria-live="polite">

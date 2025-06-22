@@ -350,7 +350,7 @@ describe('TableRowComponent', () => {
         newValue: 'Jane Doe'
       });
 
-      expect(component.rowData.name).toBe('Jane Doe');
+      expect(component.rowData?.['name']).toBe('Jane Doe');
     });
 
     it('should apply editing styling when a cell is being edited', () => {
@@ -438,7 +438,7 @@ describe('TableRowComponent', () => {
     });
 
     it('should handle undefined row data gracefully', () => {
-      component.rowData = undefined;
+      component.rowData = null;
       
       expect(() => {
         fixture.detectChanges();

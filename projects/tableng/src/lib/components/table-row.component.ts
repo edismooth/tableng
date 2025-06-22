@@ -9,48 +9,48 @@ import { CellEditConfig } from '../interfaces/cell-edit-config.interface';
 })
 export class TableRowComponent implements OnInit, OnDestroy {
   @Input() columns: ColumnDefinition[] = [];
-  @Input() rowData: any = {};
+  @Input() rowData: Record<string, unknown> | null = {};
   @Input() rowIndex!: number;
   @Input() editConfigs: Record<string, CellEditConfig> | null = null;
-  @Input() selectable: boolean = false;
-  @Input() editable: boolean = false;
-  @Input() selected: boolean = false;
+  @Input() selectable = false;
+  @Input() editable = false;
+  @Input() selected = false;
 
   @Output() rowClick = new EventEmitter<{
     rowIndex: number;
-    rowData: any;
+    rowData: Record<string, unknown> | null;
     event: MouseEvent | KeyboardEvent;
   }>();
 
   @Output() rowSelect = new EventEmitter<{
     rowIndex: number;
-    rowData: any;
+    rowData: Record<string, unknown> | null;
     selected: boolean;
   }>();
 
   @Output() cellValueChange = new EventEmitter<{
     rowIndex: number;
-    rowData: any;
+    rowData: Record<string, unknown> | null;
     column: string;
-    oldValue: any;
-    newValue: any;
+    oldValue: unknown;
+    newValue: unknown;
   }>();
 
   @Output() rowHover = new EventEmitter<{
     rowIndex: number;
-    rowData: any;
+    rowData: Record<string, unknown> | null;
     hovering: boolean;
   }>();
 
-  hovering: boolean = false;
-  hasEditingCell: boolean = false;
+  hovering = false;
+  hasEditingCell = false;
 
   ngOnInit(): void {
-    // Initialize component state
+    // Component initialization
   }
 
   ngOnDestroy(): void {
-    // Cleanup subscriptions if any
+    // Component cleanup
   }
 
   // Event Handlers

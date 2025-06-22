@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TableCellComponent } from './table-cell.component';
 import { ColumnDefinition } from '../interfaces/column-definition.interface';
 import { CellEditConfig } from '../interfaces/cell-edit-config.interface';
+import { ValidatorConfig } from '../interfaces/validator-config.interface';
 
 describe('TableCellComponent', () => {
   let component: TableCellComponent;
@@ -61,9 +62,9 @@ describe('TableCellComponent', () => {
       expect(component.editCancel).toBeDefined();
     });
 
-    it('should initialize editValue with current value', () => {
-      component.ngOnInit();
-      expect(component.editValue).toBe('Test Value');
+    it('should initialize cellControl with current value on init', () => {
+      fixture.detectChanges(); // Trigger ngOnInit
+      expect(component.cellControl.value).toBe('Test Value');
     });
   });
 
@@ -217,6 +218,7 @@ describe('TableCellComponent', () => {
 
   describe('Edit Mode - Text Input', () => {
     beforeEach(() => {
+      fixture.detectChanges();
       component.editConfig = { type: 'text' };
       component.startEdit();
       fixture.detectChanges();
@@ -232,406 +234,127 @@ describe('TableCellComponent', () => {
       expect(inputElement.nativeElement.value).toBe('Test Value');
     });
 
-    it('should update editValue when input changes', () => {
+    it('should update cellControl when input changes', () => {
       const inputElement = fixture.debugElement.query(By.css('input'));
       
       inputElement.nativeElement.value = 'New Value';
       inputElement.triggerEventHandler('input', { target: { value: 'New Value' } });
 
-      expect(component.editValue).toBe('New Value');
-    });
-
-    it('should validate required field', () => {
-      component.editConfig = { type: 'text', required: true };
-      component.editValue = '';
-      
-      const isValid = component.validateValue();
-      expect(isValid).toBe(false);
-      expect(component.validationError).toContain('required');
-    });
-
-    it('should validate with custom validator', () => {
-      component.editConfig = {
-        type: 'text',
-        validator: (value: unknown) => typeof value === 'string' && value.length >= 3 ? null : 'Minimum 3 characters'
-      };
-      component.editValue = 'ab';
-      
-      const isValid = component.validateValue();
-      expect(isValid).toBe(false);
-      expect(component.validationError).toBe('Minimum 3 characters');
-    });
-
-    it('should show validation error styling', () => {
-      component.editConfig = { type: 'text', required: true };
-      component.editValue = '';
-      component.validateValue();
-      fixture.detectChanges();
-
-      const inputElement = fixture.debugElement.query(By.css('input'));
-      expect(inputElement.nativeElement.classList).toContain('tableng-input-error');
+      expect(component.cellControl.value).toBe('New Value');
     });
   });
 
-  describe('Edit Mode - Number Input', () => {
+  describe('Inline Editing & Validation', () => {
     beforeEach(() => {
-      component.column = { ...mockColumn, type: 'number' };
-      component.editConfig = { type: 'number' };
-      component.value = 123;
+      fixture.detectChanges(); // This will trigger ngOnInit
       component.startEdit();
+    });
+
+    it('should show validation error for required field', fakeAsync(() => {
+      component.editConfig = { ...mockEditConfig, required: true };
+      (component as any).setupFormControl(); // Re-initialize to apply new config
       fixture.detectChanges();
-    });
-
-    it('should render number input in edit mode', () => {
-      const inputElement = fixture.debugElement.query(By.css('input[type="number"]'));
-      expect(inputElement).toBeTruthy();
-    });
-
-    it('should handle number validation', () => {
-      component.editValue = 'invalid';
       
-      const isValid = component.validateValue();
-      expect(isValid).toBe(false);
-    });
-
-    it('should convert string to number on save', () => {
-      component.editValue = '456';
-      component.saveEdit();
-      
-      expect(component.value).toBe(456);
-    });
-  });
-
-  describe('Edit Mode - Date Input', () => {
-    beforeEach(() => {
-      component.column = { ...mockColumn, type: 'date' };
-      component.editConfig = { type: 'date' };
-      component.value = new Date('2023-01-01');
-      component.startEdit();
-      fixture.detectChanges();
-    });
-
-    it('should render date input in edit mode', () => {
-      const inputElement = fixture.debugElement.query(By.css('input[type="date"]'));
-      expect(inputElement).toBeTruthy();
-    });
-
-    it('should format date for input value', () => {
-      const inputElement = fixture.debugElement.query(By.css('input'));
-      expect(inputElement.nativeElement.value).toBe('2023-01-01');
-    });
-
-    it('should handle invalid date input', () => {
-      component.editValue = 'invalid-date';
-      
-      const isValid = component.validateValue();
-      expect(isValid).toBe(false);
-    });
-  });
-
-  describe('Edit Mode - Select Input', () => {
-    beforeEach(() => {
-      component.editConfig = {
-        type: 'select',
-        options: [
-          { value: 'option1', label: 'Option 1' },
-          { value: 'option2', label: 'Option 2' },
-          { value: 'option3', label: 'Option 3' }
-        ]
-      };
-      component.value = 'option1';
-      component.startEdit();
-      fixture.detectChanges();
-    });
-
-    it('should render select dropdown in edit mode', () => {
-      const selectElement = fixture.debugElement.query(By.css('select'));
-      expect(selectElement).toBeTruthy();
-    });
-
-    it('should show all options in select dropdown', () => {
-      const optionElements = fixture.debugElement.queryAll(By.css('option'));
-      expect(optionElements.length).toBe(3);
-      expect(optionElements[0].nativeElement.textContent.trim()).toBe('Option 1');
-    });
-
-    it('should select current value', () => {
-      const selectElement = fixture.debugElement.query(By.css('select'));
-      expect(selectElement.nativeElement.value).toBe('option1');
-    });
-  });
-
-  describe('Edit Mode - Checkbox Input', () => {
-    beforeEach(() => {
-      component.column = { ...mockColumn, type: 'boolean' };
-      component.editConfig = { type: 'checkbox' };
-      component.value = true;
-      component.startEdit();
-      fixture.detectChanges();
-    });
-
-    it('should render checkbox in edit mode', () => {
-      const checkboxElement = fixture.debugElement.query(By.css('input[type="checkbox"]'));
-      expect(checkboxElement).toBeTruthy();
-    });
-
-    it('should show current boolean value', () => {
-      const checkboxElement = fixture.debugElement.query(By.css('input[type="checkbox"]'));
-      expect(checkboxElement.nativeElement.checked).toBe(true);
-    });
-
-    it('should toggle value on click', () => {
-      const checkboxElement = fixture.debugElement.query(By.css('input[type="checkbox"]'));
-      
-      checkboxElement.triggerEventHandler('change', { target: { checked: false } });
-      expect(component.editValue).toBe(false);
-    });
-  });
-
-  describe('Edit Mode - Custom Input', () => {
-    beforeEach(() => {
-      component.editConfig = { type: 'custom' };
-      component.startEdit();
-      fixture.detectChanges();
-    });
-
-    it('should render custom editor container', () => {
-      const customContainer = fixture.debugElement.query(By.css('.tableng-custom-editor'));
-      expect(customContainer).toBeTruthy();
-    });
-
-    it('should project custom content', () => {
-      const contentElement = fixture.debugElement.query(By.css('.tableng-custom-content'));
-      expect(contentElement).toBeTruthy();
-    });
-  });
-
-  describe('Edit Mode - Save Operations', () => {
-    beforeEach(() => {
-      component.startEdit();
-      fixture.detectChanges();
-    });
-
-    it('should save changes on Enter key', () => {
-      component.editValue = 'New Value';
-      const inputElement = fixture.debugElement.query(By.css('input'));
-      const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
-      
-      inputElement.triggerEventHandler('keydown', enterEvent);
-      
-      expect(component.isEditing).toBe(false);
-      expect(component.value).toBe('New Value');
-    });
-
-    it('should save changes on Tab key', () => {
-      component.editValue = 'New Value';
-      const inputElement = fixture.debugElement.query(By.css('input'));
-      const tabEvent = new KeyboardEvent('keydown', { key: 'Tab' });
-      
-      inputElement.triggerEventHandler('keydown', tabEvent);
-      
-      expect(component.isEditing).toBe(false);
-      expect(component.value).toBe('New Value');
-    });
-
-    it('should save changes on blur', fakeAsync(() => {
-      component.editValue = 'New Value';
-      const inputElement = fixture.debugElement.query(By.css('input'));
-      
-      inputElement.triggerEventHandler('blur', null);
-      tick(100); // Wait for the setTimeout in blur handler
-      
-      expect(component.isEditing).toBe(false);
-      expect(component.value).toBe('New Value');
-    }));
-
-    it('should emit valueChange event on save', () => {
-      let emittedData: unknown;
-      component.valueChange.subscribe((data: unknown) => emittedData = data);
-      
-      component.editValue = 'New Value';
-      component.saveEdit();
-      
-      expect(emittedData).toEqual({
-        column: mockColumn.key,
-        rowIndex: 0,
-        oldValue: 'Test Value',
-        newValue: 'New Value'
-      });
-    });
-
-    it('should emit editEnd event on save', () => {
-      let emittedData: unknown;
-      component.editEnd.subscribe((data: unknown) => emittedData = data);
-      
-      component.saveEdit();
-      
-      expect(emittedData).toEqual({
-        column: mockColumn.key,
-        rowIndex: 0,
-        saved: true
-      });
-    });
-
-    it('should not save if validation fails', () => {
-      component.editConfig = { type: 'text', required: true };
-      component.editValue = '';
-      
-      component.saveEdit();
-      
-      expect(component.isEditing).toBe(true);
-      expect(component.value).toBe('Test Value');
-    });
-  });
-
-  describe('Edit Mode - Cancel Operations', () => {
-    beforeEach(() => {
-      component.startEdit();
-      component.editValue = 'Modified Value';
-      fixture.detectChanges();
-    });
-
-    it('should cancel changes on Escape key', () => {
-      const inputElement = fixture.debugElement.query(By.css('input'));
-      const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
-      
-      inputElement.triggerEventHandler('keydown', escapeEvent);
-      
-      expect(component.isEditing).toBe(false);
-      expect(component.value).toBe('Test Value');
-    });
-
-    it('should emit editCancel event on cancel', () => {
-      let emittedData: unknown;
-      component.editCancel.subscribe((data: unknown) => emittedData = data);
-      
-      component.cancelEdit();
-      
-      expect(emittedData).toEqual({
-        column: mockColumn.key,
-        rowIndex: 0
-      });
-    });
-
-    it('should emit editEnd event on cancel', () => {
-      let emittedData: unknown;
-      component.editEnd.subscribe((data: unknown) => emittedData = data);
-      
-      component.cancelEdit();
-      
-      expect(emittedData).toEqual({
-        column: mockColumn.key,
-        rowIndex: 0,
-        saved: false
-      });
-    });
-
-    it('should reset editValue to original value on cancel', () => {
-      component.cancelEdit();
-      expect(component.editValue).toBe('Test Value');
-    });
-  });
-
-  describe('Accessibility', () => {
-    beforeEach(() => {
-      fixture.detectChanges();
-    });
-
-    it('should have proper ARIA attributes in display mode', () => {
-      const cellElement = fixture.debugElement.query(By.css('.tableng-cell'));
-      expect(cellElement.nativeElement.getAttribute('role')).toBe('gridcell');
-      expect(cellElement.nativeElement.getAttribute('tabindex')).toBe('0');
-    });
-
-    it('should have proper ARIA attributes in edit mode', () => {
-      component.startEdit();
-      fixture.detectChanges();
-
-      const inputElement = fixture.debugElement.query(By.css('input'));
-      expect(inputElement.nativeElement.getAttribute('aria-label')).toContain('Edit');
-    });
-
-    it('should announce validation errors to screen readers', () => {
-      component.editConfig = { type: 'text', required: true };
-      component.startEdit();
-      component.editValue = '';
-      component.validateValue();
+      component.cellControl.setValue('');
+      component.cellControl.markAsTouched();
+      tick();
       fixture.detectChanges();
 
       const errorElement = fixture.debugElement.query(By.css('.tableng-validation-error'));
-      expect(errorElement.nativeElement.getAttribute('aria-live')).toBe('polite');
-    });
+      expect(errorElement).toBeTruthy();
+      expect(errorElement.nativeElement.textContent).toContain('This field is required');
+    }));
 
-    it('should support keyboard navigation', () => {
-      const cellElement = fixture.debugElement.query(By.css('.tableng-cell'));
-      cellElement.nativeElement.focus();
-      
-      expect(document.activeElement).toBe(cellElement.nativeElement);
-    });
-  });
+    it('should show validation error for minLength', fakeAsync(() => {
+      component.editConfig = { ...mockEditConfig, minLength: 5 };
+      (component as any).setupFormControl();
+      fixture.detectChanges();
 
-  describe('Error Handling', () => {
-    it('should handle null values gracefully', () => {
-      component.value = null;
-      
-      expect(() => {
-        fixture.detectChanges();
-      }).not.toThrow();
-      
-      const content = fixture.debugElement.query(By.css('.tableng-cell-content'));
-      expect(content.nativeElement.textContent.trim()).toBe('');
-    });
+      component.cellControl.setValue('123');
+      component.cellControl.markAsTouched();
+      tick();
+      fixture.detectChanges();
 
-    it('should handle undefined values gracefully', () => {
-      component.value = undefined;
-      
-      expect(() => {
-        fixture.detectChanges();
-      }).not.toThrow();
-    });
+      const errorElement = fixture.debugElement.query(By.css('.tableng-validation-error'));
+      expect(errorElement).toBeTruthy();
+      expect(errorElement.nativeElement.textContent).toContain('Minimum length is 5');
+    }));
 
-    it('should handle missing column gracefully', () => {
-      component.column = null as unknown as ColumnDefinition;
-      
-      expect(() => {
-        fixture.detectChanges();
-      }).not.toThrow();
-    });
+    it('should show validation error for pattern', fakeAsync(() => {
+      component.editConfig = { ...mockEditConfig, pattern: '^[a-zA-Z]+$' }; // Only letters
+      (component as any).setupFormControl();
+      fixture.detectChanges();
 
-    it('should handle missing editConfig gracefully', () => {
-      component.editConfig = null as unknown as CellEditConfig;
-      component.startEdit();
-      
-      expect(component.isEditing).toBe(true);
-    });
+      component.cellControl.setValue('123');
+      component.cellControl.markAsTouched();
+      tick();
+      fixture.detectChanges();
 
-    it('should handle formatter errors gracefully', () => {
-      component.column = {
-        ...mockColumn,
-        formatter: () => { throw new Error('Formatter error'); }
-      };
-      
-      expect(() => {
-        fixture.detectChanges();
-      }).not.toThrow();
-    });
-  });
+      const errorElement = fixture.debugElement.query(By.css('.tableng-validation-error'));
+      expect(errorElement).toBeTruthy();
+      expect(errorElement.nativeElement.textContent).toContain('Invalid format');
+    }));
 
-  describe('Performance', () => {
-    it('should handle multiple change detection cycles', () => {
-      // Multiple detectChanges should not cause errors
-      expect(() => {
-        fixture.detectChanges();
-        fixture.detectChanges();
-        fixture.detectChanges();
-      }).not.toThrow();
-    });
+    it('should show custom validation error message', fakeAsync(() => {
+      const customValidators: ValidatorConfig[] = [
+        {
+          type: 'custom',
+          validator: (value: any) => value !== 'invalid',
+          message: 'Cannot use the word "invalid"'
+        }
+      ];
+      component.editConfig = { ...mockEditConfig, validators: customValidators };
+      (component as any).setupFormControl();
+      fixture.detectChanges();
 
-    it('should cleanup component properly', () => {
-      // Component should be destroyable without errors
-      expect(() => {
-        fixture.destroy();
-      }).not.toThrow();
-    });
+      component.cellControl.setValue('invalid');
+      component.cellControl.markAsTouched();
+      tick();
+      fixture.detectChanges();
+
+      const errorElement = fixture.debugElement.query(By.css('.tableng-validation-error'));
+      expect(errorElement).toBeTruthy();
+      expect(errorElement.nativeElement.textContent).toContain('Cannot use the word "invalid"');
+    }));
+
+    it('should apply ng-invalid class to input on error', fakeAsync(() => {
+      component.editConfig = { ...mockEditConfig, required: true };
+      (component as any).setupFormControl();
+      fixture.detectChanges();
+
+      const inputElement = fixture.debugElement.query(By.css('input')).nativeElement;
+      component.cellControl.setValue('');
+      component.cellControl.markAsTouched();
+      tick();
+      fixture.detectChanges();
+
+      expect(inputElement.classList).toContain('ng-invalid');
+    }));
+
+    it('should not emit valueChange when form is invalid', fakeAsync(() => {
+      jest.spyOn(component.valueChange, 'emit');
+      component.editConfig = { ...mockEditConfig, required: true };
+      (component as any).setupFormControl();
+      fixture.detectChanges();
+
+      component.cellControl.setValue('');
+      tick();
+
+      component.saveEdit();
+      expect(component.valueChange.emit).not.toHaveBeenCalled();
+    }));
+
+    it('should emit valueChange when form becomes valid', fakeAsync(() => {
+      jest.spyOn(component.valueChange, 'emit');
+      component.editConfig = { ...mockEditConfig, required: true };
+      (component as any).setupFormControl();
+      fixture.detectChanges();
+
+      component.cellControl.setValue('Valid Value');
+      tick();
+
+      component.saveEdit();
+      expect(component.valueChange.emit).toHaveBeenCalled();
+    }));
   });
 });

@@ -1,3 +1,5 @@
+import { ValidatorConfig } from './validator-config.interface';
+
 /**
  * Supported edit types for inline editing
  */
@@ -45,11 +47,17 @@ export interface CellEditConfig {
   /** Options for select/dropdown editors */
   options?: string[] | SelectOption[];
   
-  /** Validation rules */
-  validation?: ValidationRules;
-  
-  /** Custom validator function that returns error message or null */
-  validator?: (value: unknown) => string | null;
+  /** Minimum length for text inputs */
+  minLength?: number;
+
+  /** Maximum length for text inputs */
+  maxLength?: number;
+
+  /** Regex pattern for validation */
+  pattern?: string;
+
+  /** Array of validator configurations */
+  validators?: ValidatorConfig[];
   
   /** Whether the editor is disabled */
   disabled?: boolean;

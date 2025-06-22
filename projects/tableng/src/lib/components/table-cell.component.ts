@@ -1,6 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { FormControl, ValidatorFn, Validators, AbstractControl } from '@angular/forms';
 import { ColumnDefinition } from '../interfaces/column-definition.interface';
 import { CellEditConfig } from '../interfaces/cell-edit-config.interface';
+import { ValidatorConfig } from '../interfaces/validator-config.interface';
 
 @Component({
   selector: 'tng-table-cell',
@@ -41,14 +43,15 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('editInput') editInput!: ElementRef;
 
   isEditing: boolean = false;
-  editValue: unknown;
   originalValue: unknown;
-  validationError: string | null = null;
+  cellControl!: FormControl;
   showEditIndicator: boolean = false;
+
+  constructor(private cd: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.originalValue = this.value;
-    this.editValue = this.value;
+    this.setupFormControl();
   }
 
   ngOnDestroy(): void {
@@ -101,8 +104,8 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     this.isEditing = true;
-    this.editValue = this.value;
-    this.validationError = null;
+    this.cellControl.setValue(this.value);
+    this.cellControl.markAsPristine();
 
     this.editStart.emit({
       column: this.column.key,
@@ -119,14 +122,13 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   saveEdit(): void {
-    if (!this.validateValue()) {
+    if (this.cellControl.invalid) {
       return;
     }
 
     const oldValue = this.value;
-    this.value = this.processEditValue();
+    this.value = this.cellControl.value;
     this.isEditing = false;
-    this.validationError = null;
 
     this.valueChange.emit({
       column: this.column.key,
@@ -144,8 +146,7 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
 
   cancelEdit(): void {
     this.isEditing = false;
-    this.editValue = this.originalValue;
-    this.validationError = null;
+    this.cellControl.setValue(this.originalValue);
 
     this.editCancel.emit({
       column: this.column.key,
@@ -160,60 +161,77 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // Validation
-  validateValue(): boolean {
-    this.validationError = null;
-
-    // Required validation
-    if (this.editConfig?.required && (this.editValue == null || this.editValue === '')) {
-      this.validationError = 'This field is required';
-      return false;
+  setupFormControl(): void {
+    const validators: ValidatorFn[] = [];
+    if (this.editConfig?.required) {
+      validators.push(Validators.required);
+    }
+    if (this.editConfig?.minLength) {
+      validators.push(Validators.minLength(this.editConfig.minLength));
+    }
+    if (this.editConfig?.maxLength) {
+      validators.push(Validators.maxLength(this.editConfig.maxLength));
+    }
+    if (this.editConfig?.pattern) {
+      validators.push(Validators.pattern(this.editConfig.pattern));
+    }
+    if (this.editConfig?.validators) {
+      this.editConfig.validators.forEach((validatorConfig: ValidatorConfig) => {
+        validators.push((control: AbstractControl) => {
+          return validatorConfig.validator(control.value) ? null : { [validatorConfig.type]: true };
+        });
+      });
     }
 
-    // Type-specific validation
-    if (this.editValue != null && this.editValue !== '') {
-      switch (this.getEditType()) {
-        case 'number':
-          if (isNaN(Number(this.editValue))) {
-            this.validationError = 'Please enter a valid number';
-            return false;
-          }
-          break;
-        case 'date':
-          if (this.editValue && isNaN(Date.parse(String(this.editValue)))) {
-            this.validationError = 'Please enter a valid date';
-            return false;
-          }
-          break;
+    this.cellControl = new FormControl(this.value, validators);
+  }
+
+  get validationError(): string | null {
+    if (!this.cellControl || !this.cellControl.errors) {
+      return null;
+    }
+
+    const errors = this.cellControl.errors;
+    if (errors['required']) {
+      return 'This field is required';
+    }
+    if (errors['minlength']) {
+      return `Minimum length is ${this.editConfig?.minLength}`;
+    }
+    if (errors['maxlength']) {
+      return `Maximum length is ${this.editConfig?.maxLength}`;
+    }
+    if (errors['pattern']) {
+      return 'Invalid format';
+    }
+    
+    // Check for custom validator errors
+    if (this.editConfig?.validators) {
+      for (const validator of this.editConfig.validators) {
+        if (errors[validator.type]) {
+          return validator.message;
+        }
       }
     }
-
-    // Custom validation
-    if (this.editConfig?.validator) {
-      const customError = this.editConfig.validator(this.editValue);
-      if (customError) {
-        this.validationError = customError;
-        return false;
-      }
-    }
-
-    return true;
+    
+    return 'Invalid value';
   }
 
   // Value processing
   processEditValue(): unknown {
-    if (this.editValue == null || this.editValue === '') {
-      return this.editValue;
+    if (this.cellControl.value == null || this.cellControl.value === '') {
+      return this.cellControl.value;
     }
 
     switch (this.getEditType()) {
       case 'number':
-        return Number(this.editValue);
+        return Number(this.cellControl.value);
       case 'date':
-        return new Date(String(this.editValue));
+        return new Date(String(this.cellControl.value));
       case 'checkbox':
-        return Boolean(this.editValue);
+        return Boolean(this.cellControl.value);
       default:
-        return this.editValue;
+        return this.cellControl.value;
     }
   }
 
@@ -224,10 +242,10 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Date input helpers
   getDateInputValue(): string {
-    if (!this.editValue) return '';
+    if (!this.cellControl.value) return '';
     
     try {
-      const date = this.editValue instanceof Date ? this.editValue : new Date(String(this.editValue));
+      const date = this.cellControl.value instanceof Date ? this.cellControl.value : new Date(String(this.cellControl.value));
       return date.toISOString().split('T')[0];
     } catch {
       return '';
@@ -266,18 +284,15 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onInputChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.editValue = target.value;
+    // Value is handled by form control
   }
 
   onSelectChange(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    this.editValue = target.value;
+    // Value is handled by form control
   }
 
   onCheckboxChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.editValue = target.checked;
+    // Value is handled by form control
   }
 
   onBlur(): void {

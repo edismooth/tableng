@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { TableConfig } from '../interfaces/table-config.interface';
 import { ColumnDefinition, SortDirection } from '../interfaces/column-definition.interface';
 import { LocalStorageService, TableState } from './local-storage.service';
+import { TableRow } from '../interfaces/table-row.interface';
 
 /**
  * Sort state for a column
@@ -29,8 +30,8 @@ export interface FilterState {
 export class TableStateService {
   // State subjects
   private readonly configSubject = new BehaviorSubject<TableConfig | null>(null);
-  private readonly dataSubject = new BehaviorSubject<any[]>([]);
-  private readonly visibleDataSubject = new BehaviorSubject<any[]>([]);
+  private readonly dataSubject = new BehaviorSubject<TableRow<any>[]>([]);
+  private readonly visibleDataSubject = new BehaviorSubject<TableRow<any>[]>([]);
   private readonly sortStateSubject = new BehaviorSubject<SortState | null>(null);
   private readonly filterStateSubject = new BehaviorSubject<FilterState>({});
 
@@ -42,7 +43,7 @@ export class TableStateService {
   readonly filterState$ = this.filterStateSubject.asObservable();
 
   // Internal state
-  private originalData: any[] = [];
+  private originalData: TableRow<any>[] = [];
   private currentConfig: TableConfig | null = null;
   private columnOrder: string[] = [];
   private columnWidths: Record<string, number> = {};
@@ -57,7 +58,7 @@ export class TableStateService {
    */
   initializeTable(config: TableConfig, data: any[]): void {
     this.currentConfig = config;
-    this.originalData = [...data];
+    this.originalData = config.treeMode ? this.structureTreeData(data) : data.map(item => ({ data: item, level: 0, expanded: false }));
     this.columnOrder = config.columns.map(col => col.key);
     
     // Load persisted state if available
@@ -68,7 +69,7 @@ export class TableStateService {
 
     // Update subjects
     this.configSubject.next(config);
-    this.dataSubject.next(data);
+    this.dataSubject.next(this.originalData);
     this.applyFiltersAndSorting();
   }
 
@@ -76,8 +77,8 @@ export class TableStateService {
    * Update table data while preserving filters and sorting
    */
   updateData(data: any[]): void {
-    this.originalData = [...data];
-    this.dataSubject.next(data);
+    this.originalData = this.currentConfig?.treeMode ? this.structureTreeData(data) : data.map(item => ({ data: item, level: 0, expanded: false }));
+    this.dataSubject.next(this.originalData);
     this.applyFiltersAndSorting();
   }
 
@@ -91,14 +92,14 @@ export class TableStateService {
   /**
    * Get original unfiltered data
    */
-  getData(): any[] {
+  getData(): TableRow<any>[] {
     return [...this.originalData];
   }
 
   /**
    * Get filtered and sorted visible data
    */
-  getVisibleData(): any[] {
+  getVisibleData(): TableRow<any>[] {
     return this.visibleDataSubject.value;
   }
 
@@ -150,6 +151,27 @@ export class TableStateService {
     if (!this.currentConfig) return [];
     
     return this.currentConfig.columns.filter(col => col.visible !== false);
+  }
+
+  /**
+   * Get all columns (including hidden ones)
+   */
+  getAllColumns(): ColumnDefinition[] {
+    if (!this.currentConfig) return [];
+    
+    return [...this.currentConfig.columns];
+  }
+
+  // Tree-Grid Management
+  /**
+   * Toggles the expansion state of a row
+   * @param row The row to toggle
+   */
+  toggleRowExpansion(row: TableRow<any>): void {
+    if (row.children && row.children.length > 0) {
+      row.expanded = !row.expanded;
+      this.applyFiltersAndSorting();
+    }
   }
 
   // Sorting
@@ -234,11 +256,19 @@ export class TableStateService {
    * Apply current filters and sorting to data
    */
   private applyFiltersAndSorting(): void {
-    let result = [...this.originalData];
+    let result: TableRow<any>[];
 
-    // Apply filters first
-    result = this.applyFilters(result);
-
+    // If tree mode is enabled, flatten the data based on expansion state
+    if (this.currentConfig?.treeMode) {
+      // For tree mode, filtering should be more complex (e.g., keep parent if child matches)
+      // For now, we'll apply a simple filter on the flattened data, which isn't ideal but will work.
+      const flattened = this.flattenTreeData(this.originalData);
+      result = this.applyFilters(flattened);
+    } else {
+      // For non-tree mode, we still use the wrapper but operate on a flat list
+      result = this.applyFilters(this.originalData);
+    }
+    
     // Then apply sorting
     result = this.applySorting(result);
 
@@ -248,14 +278,15 @@ export class TableStateService {
   /**
    * Apply filters to data
    */
-  private applyFilters(data: any[]): any[] {
+  private applyFilters(data: TableRow<any>[]): TableRow<any>[] {
     if (Object.keys(this.currentFilters).length === 0) {
       return data;
     }
 
-    return data.filter(item => {
+    return data.filter(row => {
       return Object.entries(this.currentFilters).every(([columnKey, filterValue]) => {
-        const cellValue = item[columnKey];
+        // All data, tree or not, is wrapped in TableRow, so we access .data
+        const cellValue = row.data[columnKey];
         if (cellValue == null) return false;
         
         return String(cellValue).toLowerCase().includes(filterValue.toLowerCase());
@@ -266,19 +297,22 @@ export class TableStateService {
   /**
    * Apply sorting to data
    */
-  private applySorting(data: any[]): any[] {
+  private applySorting(data: TableRow<any>[]): TableRow<any>[] {
     if (!this.currentSort) {
       return data;
     }
 
     const { column, direction } = this.currentSort;
     
-    return [...data].sort((a, b) => {
-      const aValue = a[column];
-      const bValue = b[column];
+    // Create a stable sort by preserving original order for equal items
+    const indexedData = data.map((item, index) => ({ item, index }));
+
+    indexedData.sort((a, b) => {
+      const aValue = a.item.data[column];
+      const bValue = b.item.data[column];
       
       // Handle null/undefined values
-      if (aValue == null && bValue == null) return 0;
+      if (aValue == null && bValue == null) return a.index - b.index;
       if (aValue == null) return direction === 'asc' ? -1 : 1;
       if (bValue == null) return direction === 'asc' ? 1 : -1;
       
@@ -290,8 +324,75 @@ export class TableStateService {
         comparison = String(aValue).localeCompare(String(bValue));
       }
       
+      if (comparison === 0) {
+        return a.index - b.index; // Preserve original order if values are equal
+      }
+
       return direction === 'asc' ? comparison : -comparison;
     });
+
+    return indexedData.map(d => d.item);
+  }
+
+  /**
+   * Recursively flattens the tree data to a single-level array for rendering,
+   * respecting the `expanded` state of each node.
+   * @param nodes The array of nodes to flatten.
+   */
+  private flattenTreeData(nodes: TableRow<any>[]): TableRow<any>[] {
+    const flattened: TableRow<any>[] = [];
+
+    for (const node of nodes) {
+      flattened.push(node);
+      if (node.expanded && node.children) {
+        flattened.push(...this.flattenTreeData(node.children));
+      }
+    }
+
+    return flattened;
+  }
+
+  /**
+   * Structures the raw data into a tree format, setting levels and parent references.
+   * @param data The raw data array.
+   */
+  private structureTreeData(data: any[]): TableRow<any>[] {
+    const structuredData: TableRow<any>[] = [];
+    const recursion = (items: any[], level: number, parent?: TableRow<any>) => {
+      for (const item of items) {
+        const tableRow: TableRow<any> = {
+          data: item,
+          level: level,
+          expanded: item.expanded === true, // Default to false if not specified
+          parent: parent,
+          isVisible: true,
+        };
+        structuredData.push(tableRow);
+        if (item.children && item.children.length > 0) {
+          tableRow.children = [];
+          recursion(item.children, level + 1, tableRow);
+        }
+      }
+    };
+    recursion(data, 0);
+    
+    // This is a simplified structuring. A more robust solution would map parent-child relationships.
+    // For now, we assume the initial data is already nested correctly.
+    // The main task is to create the TableRow objects.
+    return data.map(item => this.createTableRow(item, 0));
+  }
+
+  private createTableRow(item: any, level: number, parent?: TableRow<any>): TableRow<any> {
+    const row: TableRow<any> = {
+      data: item,
+      level,
+      expanded: item.expanded || false,
+      parent,
+    };
+    if (item.children) {
+      row.children = item.children.map((child: any) => this.createTableRow(child, level + 1, row));
+    }
+    return row;
   }
 
   /**
@@ -315,5 +416,22 @@ export class TableStateService {
       this.currentFilters = state.filterState;
       this.filterStateSubject.next(this.currentFilters);
     }
+  }
+
+  /**
+   * Save current state to localStorage
+   */
+  private saveCurrentState(): void {
+    if (!this.currentConfig) return;
+
+    const state: TableState = {
+      config: this.currentConfig,
+      columnOrder: this.columnOrder,
+      columnWidths: this.columnWidths,
+      sortState: this.currentSort,
+      filterState: this.currentFilters
+    };
+
+    this.localStorageService.saveTableState(this.currentConfig.tableId, state);
   }
 } 
