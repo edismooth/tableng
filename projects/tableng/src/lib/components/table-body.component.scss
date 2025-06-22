@@ -1,0 +1,177 @@
+.tableng-body {
+  overflow-x: auto;
+  overflow-y: auto;
+  flex: 1;
+  background: #ffffff;
+}
+
+.tableng-virtual-scroll-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.tableng-regular-container {
+  width: 100%;
+}
+
+.tableng-row {
+  display: flex;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  outline: none;
+}
+
+.tableng-row:hover,
+.tableng-row-hover {
+  background-color: #f8f9fa;
+}
+
+.tableng-row-selected {
+  background-color: #e3f2fd !important;
+}
+
+.tableng-row:focus {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+}
+
+.tableng-row:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.tableng-cell {
+  padding: 12px;
+  border-right: 1px solid #e9ecef;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.tableng-cell-content {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tableng-cell-editable {
+  cursor: pointer;
+}
+
+.tableng-cell-editable:hover {
+  background-color: #f1f3f4;
+}
+
+.tableng-selection-cell {
+  width: 40px;
+  min-width: 40px;
+  justify-content: center;
+  padding: 8px;
+}
+
+.tableng-selection-checkbox {
+  cursor: pointer;
+}
+
+/* Loading State */
+.tableng-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 40px;
+}
+
+.tableng-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.tableng-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: tableng-spin 1s linear infinite;
+}
+
+.tableng-loading-text {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+@keyframes tableng-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.tableng-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 40px;
+}
+
+.tableng-empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.tableng-empty-icon {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+.tableng-empty-message {
+  color: #6c757d;
+  font-size: 16px;
+}
+
+/* Virtual Scroll Spacers */
+.tableng-virtual-spacer-top,
+.tableng-virtual-spacer-bottom {
+  width: 100%;
+}
+
+/* Cell Type Specific Styles */
+.tableng-cell-text {
+  text-align: left;
+}
+
+.tableng-cell-number {
+  text-align: right;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+}
+
+.tableng-cell-date {
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+}
+
+.tableng-cell-boolean {
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Accessibility */
+.tableng-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+} 

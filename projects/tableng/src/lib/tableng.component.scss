@@ -1,0 +1,69 @@
+.tableng-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: var(--tableng-bg, white);
+  border: 1px solid var(--tableng-border, #e0e0e0);
+  border-radius: 4px;
+}
+
+.tableng-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: inherit;
+}
+
+.tableng-table:focus {
+  outline: 2px solid var(--tableng-primary, #007bff);
+  outline-offset: -2px;
+}
+
+.tableng-sticky-header thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: inherit;
+}
+
+.tableng-virtual-scroll {
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* Theme: Dark */
+.tableng-theme-dark {
+  --tableng-bg: #1a1a1a;
+  --tableng-surface: #2a2a2a;
+  --tableng-text: #ffffff;
+  --tableng-text-secondary: #cccccc;
+  --tableng-border: #404040;
+  --tableng-hover: #3a3a3a;
+  --tableng-selected: #4a4a4a;
+  --tableng-primary: #007bff;
+  color: var(--tableng-text);
+}
+
+/* Theme: Light (default) */
+.tableng-theme-light {
+  --tableng-bg: #ffffff;
+  --tableng-surface: #f8f9fa;
+  --tableng-text: #212529;
+  --tableng-text-secondary: #6c757d;
+  --tableng-border: #dee2e6;
+  --tableng-hover: #e9ecef;
+  --tableng-selected: #e7f3ff;
+  --tableng-primary: #007bff;
+}
+
+.tableng-sr-announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+} 

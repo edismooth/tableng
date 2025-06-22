@@ -1,0 +1,125 @@
+.tableng-header {
+  background: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  user-select: none;
+}
+
+.tableng-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tableng-header-row {
+  display: flex;
+  width: 100%;
+}
+
+.tableng-header-cell {
+  position: relative;
+  padding: 12px;
+  border-right: 1px solid #dee2e6;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tableng-header-cell:hover {
+  background-color: #e9ecef;
+}
+
+.tableng-header-cell.tableng-sortable {
+  cursor: pointer;
+}
+
+.tableng-header-cell.tableng-dragging {
+  opacity: 0.5;
+  background-color: #cce5ff;
+}
+
+.tableng-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  pointer-events: none;
+}
+
+.tableng-header-cell-title {
+  font-weight: 600;
+  color: #495057;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tableng-sort-icon {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #6c757d;
+  min-width: 12px;
+  text-align: center;
+}
+
+.tableng-sorted-asc .tableng-sort-icon {
+  color: #007bff;
+}
+
+.tableng-sorted-desc .tableng-sort-icon {
+  color: #007bff;
+}
+
+.tableng-filter-container {
+  margin-top: 8px;
+  pointer-events: auto;
+}
+
+.tableng-filter-input {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 12px;
+  background: white;
+}
+
+.tableng-filter-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.tableng-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 100%;
+  cursor: col-resize;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tableng-resize-handle:hover .tableng-resize-line {
+  background-color: #007bff;
+}
+
+.tableng-resize-line {
+  width: 2px;
+  height: 60%;
+  background-color: #dee2e6;
+  transition: background-color 0.2s;
+}
+
+/* Accessibility focus styles */
+.tableng-header-cell:focus {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+}
+
+.tableng-header-cell:focus:not(:focus-visible) {
+  outline: none;
+} 

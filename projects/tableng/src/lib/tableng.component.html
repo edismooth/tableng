@@ -1,0 +1,44 @@
+<div class="tableng-container" 
+     [class.tableng-virtual-scroll]="config?.virtualScrolling"
+     [class.tableng-theme-dark]="getThemeName() === 'dark'"
+     [class.tableng-theme-light]="getThemeName() === 'light'"
+     [class.tableng-loading]="loading">
+  
+  <table class="tableng-table"
+         role="table"
+         tabindex="0"
+         [attr.aria-label]="config?.tableId || 'Data table'"
+         [class.tableng-sticky-header]="config?.stickyHeaders">
+    
+    <thead>
+      <tng-table-header
+        [columns]="visibleColumns"
+        [config]="config"
+        [sortState]="currentSortState"
+        [filterState]="currentFilterState"
+        (sortChange)="onSortChange($event)"
+        (filterChange)="onFilterChange($event)"
+        (columnResize)="onColumnResize($event)"
+        (columnReorder)="onColumnReorder($event)">
+      </tng-table-header>
+    </thead>
+    
+    <tbody>
+      <tng-table-body
+        [data]="filteredData"
+        [columns]="visibleColumns"
+        [config]="config"
+        [editConfigs]="editConfigs"
+        [selectedRows]="selectedRowsSet"
+        (rowClick)="onRowClick($event)"
+        (rowSelect)="onRowSelect($event)"
+        (cellChange)="onCellChange($event)">
+      </tng-table-body>
+    </tbody>
+  </table>
+  
+  <!-- Screen reader announcements -->
+  <div class="tableng-sr-announcer" aria-live="polite" aria-atomic="true">
+    {{ announcement }}
+  </div>
+</div> 

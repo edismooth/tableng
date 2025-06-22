@@ -1,0 +1,120 @@
+<div class="tableng-cell"
+     [class.tableng-cell-editable]="editable && !editConfig?.readonly && !editConfig?.disabled"
+     [class.tableng-cell-editing]="isEditing"
+     [class.tableng-cell-error]="validationError"
+     role="gridcell"
+     tabindex="0"
+     (dblclick)="onDoubleClick()"
+     (keydown)="onKeyDown($event)"
+     (mouseenter)="onMouseEnter()"
+     (mouseleave)="onMouseLeave()">
+  
+  <!-- Display Mode -->
+  <div *ngIf="!isEditing" class="tableng-cell-display">
+    <div class="tableng-cell-content"
+         [class.tableng-cell-text]="column?.type === 'text'"
+         [class.tableng-cell-number]="column?.type === 'number'"
+         [class.tableng-cell-date]="column?.type === 'date'"
+         [class.tableng-cell-boolean]="column?.type === 'boolean'">
+      {{ getFormattedValue() }}
+    </div>
+    
+    <!-- Edit Indicator -->
+    <div *ngIf="showEditIndicator" class="tableng-edit-indicator" aria-hidden="true">
+      ✏️
+    </div>
+  </div>
+  
+  <!-- Edit Mode -->
+  <div *ngIf="isEditing" class="tableng-cell-edit">
+    
+    <!-- Text Input -->
+    <input *ngIf="getEditType() === 'text'"
+           #editInput
+           type="text"
+           class="tableng-input"
+           [class.tableng-input-error]="validationError"
+           [value]="editValue"
+           [disabled]="editConfig?.disabled"
+           [readonly]="editConfig?.readonly"
+           [required]="editConfig?.required"
+           [attr.aria-label]="'Edit ' + column?.title"
+           (input)="onInputChange($event)"
+           (keydown)="onEditKeyDown($event)"
+           (blur)="onBlur()" />
+    
+    <!-- Number Input -->
+    <input *ngIf="getEditType() === 'number'"
+           #editInput
+           type="number"
+           class="tableng-input"
+           [class.tableng-input-error]="validationError"
+           [value]="editValue"
+           [disabled]="editConfig?.disabled"
+           [readonly]="editConfig?.readonly"
+           [required]="editConfig?.required"
+           [attr.aria-label]="'Edit ' + column?.title"
+           (input)="onInputChange($event)"
+           (keydown)="onEditKeyDown($event)"
+           (blur)="onBlur()" />
+    
+    <!-- Date Input -->
+    <input *ngIf="getEditType() === 'date'"
+           #editInput
+           type="date"
+           class="tableng-input"
+           [class.tableng-input-error]="validationError"
+           [value]="getDateInputValue()"
+           [disabled]="editConfig?.disabled"
+           [readonly]="editConfig?.readonly"
+           [required]="editConfig?.required"
+           [attr.aria-label]="'Edit ' + column?.title"
+           (input)="onInputChange($event)"
+           (keydown)="onEditKeyDown($event)"
+           (blur)="onBlur()" />
+    
+    <!-- Select Dropdown -->
+    <select *ngIf="getEditType() === 'select'"
+            #editInput
+            class="tableng-select"
+            [class.tableng-input-error]="validationError"
+            [value]="editValue"
+            [disabled]="editConfig?.disabled"
+            [required]="editConfig?.required"
+            [attr.aria-label]="'Edit ' + column?.title"
+            (change)="onSelectChange($event)"
+            (keydown)="onEditKeyDown($event)"
+            (blur)="onBlur()">
+      <option *ngFor="let option of editConfig?.options" [value]="option.value">
+        {{ option.label }}
+      </option>
+    </select>
+    
+    <!-- Checkbox -->
+    <input *ngIf="getEditType() === 'checkbox'"
+           #editInput
+           type="checkbox"
+           class="tableng-checkbox"
+           [checked]="editValue"
+           [disabled]="editConfig?.disabled"
+           [attr.aria-label]="'Edit ' + column?.title"
+           (change)="onCheckboxChange($event)"
+           (keydown)="onEditKeyDown($event)"
+           (blur)="onBlur()" />
+    
+    <!-- Custom Editor -->
+    <div *ngIf="getEditType() === 'custom'" class="tableng-custom-editor">
+      <div class="tableng-custom-content">
+        <ng-content></ng-content>
+      </div>
+    </div>
+    
+    <!-- Validation Error -->
+    <div *ngIf="validationError" 
+         class="tableng-validation-error"
+         role="alert"
+         aria-live="polite">
+      {{ validationError }}
+    </div>
+  </div>
+</div> 
