@@ -353,7 +353,7 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
     this.stateService.sortState$
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
-        this.currentSortState = state;
+        // Sort state is now handled by the getter
         this.cd.markForCheck();
       });
 

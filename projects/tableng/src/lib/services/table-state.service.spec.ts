@@ -1,9 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { BehaviorSubject } from 'rxjs';
 import { TableStateService } from './table-state.service';
 import { LocalStorageService } from './local-storage.service';
 import { TableConfig } from '../interfaces/table-config.interface';
-import { ColumnDefinition } from '../interfaces/column-definition.interface';
 
 describe('TableStateService', () => {
   let service: TableStateService;
@@ -343,7 +341,7 @@ describe('TableStateService', () => {
       
       expect(mockLocalStorageService.saveTableState).toHaveBeenCalledWith(
         'test-table',
-        jasmine.objectContaining({
+        expect.objectContaining({
           columnOrder: ['name', 'age', 'id']
         })
       );
@@ -354,8 +352,8 @@ describe('TableStateService', () => {
       
       expect(mockLocalStorageService.saveTableState).toHaveBeenCalledWith(
         'test-table',
-        jasmine.objectContaining({
-          columnWidths: jasmine.objectContaining({ name: 200 })
+        expect.objectContaining({
+          columnWidths: expect.objectContaining({ name: 200 })
         })
       );
     });
@@ -365,7 +363,7 @@ describe('TableStateService', () => {
       
       expect(mockLocalStorageService.saveTableState).toHaveBeenCalledWith(
         'test-table',
-        jasmine.objectContaining({
+        expect.objectContaining({
           sortState: { column: 'name', direction: 'asc' }
         })
       );
