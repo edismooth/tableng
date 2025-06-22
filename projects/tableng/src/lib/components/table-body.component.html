@@ -1,109 +1,109 @@
 <div class="tableng-body" 
-     [ngClass]="getBodyClasses()"
-     [attr.role]="'rowgroup'"
-     (scroll)="onScroll($event)">
-  
-  <!-- Loading State -->
-  <div *ngIf="loading" class="tableng-loading">
-    <div class="tableng-loading-content">
-      <div class="tableng-loading-spinner"></div>
-      <span class="tableng-loading-text">Loading...</span>
-    </div>
-  </div>
-
-  <!-- Empty State -->
-  <div *ngIf="!loading && (!data || data.length === 0)" class="tableng-empty">
-    <div class="tableng-empty-content">
-      <div class="tableng-empty-icon">📄</div>
-      <div class="tableng-empty-message">{{ emptyMessage || 'No data available' }}</div>
-    </div>
-  </div>
-
-  <!-- Virtual Scroll Container -->
-  <div *ngIf="!loading && data && data.length > 0 && config?.virtualScrolling" 
-       class="tableng-virtual-scroll-container"
-       [style.height.px]="getVirtualScrollHeight()">
-    
-    <!-- Spacer for scroll positioning -->
-    <div class="tableng-virtual-spacer-top" 
-         [style.height.px]="getTopSpacerHeight()"></div>
-
-    <!-- Visible Rows -->
-    <div *ngFor="let item of getVisibleData(); let i = index; trackBy: trackByFn" 
-         class="tableng-row"
-         [ngClass]="getRowClasses(item, getActualRowIndex(i))"
-         [attr.role]="'row'"
-         [attr.tabindex]="'0'"
-         (click)="onRowClick(item, getActualRowIndex(i))"
-         (keydown)="onRowKeyDown($event, item, getActualRowIndex(i))"
-         (mouseenter)="onRowMouseEnter($event)"
-         (mouseleave)="onRowMouseLeave($event)">
+         [ngClass]="getBodyClasses()"
+         [attr.role]="'rowgroup'"
+         (scroll)="onScroll($event)">
       
-      <!-- Selection Checkbox -->
-      <div *ngIf="config?.selectable" class="tableng-cell tableng-selection-cell">
-        <input type="checkbox" 
-               class="tableng-selection-checkbox"
-               [checked]="isRowSelected(item)"
-               (change)="onRowSelect($event, item, getActualRowIndex(i))"
-               (click)="$event.stopPropagation()">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="tableng-loading">
+        <div class="tableng-loading-content">
+          <div class="tableng-loading-spinner"></div>
+          <span class="tableng-loading-text">Loading...</span>
+        </div>
       </div>
 
-      <!-- Data Cells -->
-      <div *ngFor="let column of columns" 
-           class="tableng-cell"
-           [ngClass]="getCellClasses(column, item)"
-           [style.width.px]="column.width"
-           [attr.role]="'gridcell'"
-           (dblclick)="onCellDoubleClick(column, item, getActualRowIndex(i))"
-           (click)="onCellClick($event, column, item, getActualRowIndex(i))">
+      <!-- Empty State -->
+      <div *ngIf="!loading && (!data || data.length === 0)" class="tableng-empty">
+        <div class="tableng-empty-content">
+          <div class="tableng-empty-icon">📄</div>
+          <div class="tableng-empty-message">{{ emptyMessage || 'No data available' }}</div>
+        </div>
+      </div>
+
+      <!-- Virtual Scroll Container -->
+      <div *ngIf="!loading && data && data.length > 0 && config?.virtualScrolling" 
+           class="tableng-virtual-scroll-container"
+           [style.height.px]="getVirtualScrollHeight()">
         
-        <span class="tableng-cell-content">
-          {{ formatCellValue(item, column) }}
-        </span>
+        <!-- Spacer for scroll positioning -->
+        <div class="tableng-virtual-spacer-top" 
+             [style.height.px]="getTopSpacerHeight()"></div>
+
+        <!-- Visible Rows -->
+        <div *ngFor="let item of getVisibleData(); let i = index; trackBy: trackByFn" 
+             class="tableng-row"
+             [ngClass]="getRowClasses(item, getActualRowIndex(i))"
+             [attr.role]="'row'"
+             [attr.tabindex]="'0'"
+             (click)="onRowClick(item, getActualRowIndex(i))"
+             (keydown)="onRowKeyDown($event, item, getActualRowIndex(i))"
+             (mouseenter)="onRowMouseEnter($event)"
+             (mouseleave)="onRowMouseLeave($event)">
+          
+          <!-- Selection Checkbox -->
+          <div *ngIf="config?.selectable" class="tableng-cell tableng-selection-cell">
+            <input type="checkbox" 
+                   class="tableng-selection-checkbox"
+                   [checked]="isRowSelected(item)"
+                   (change)="onRowSelect($event, item, getActualRowIndex(i))"
+                   (click)="$event.stopPropagation()">
+          </div>
+
+          <!-- Data Cells -->
+          <div *ngFor="let column of columns" 
+               class="tableng-cell"
+               [ngClass]="getCellClasses(column, item)"
+               [style.width.px]="column.width"
+               [attr.role]="'gridcell'"
+               (dblclick)="onCellDoubleClick(column, item, getActualRowIndex(i))"
+               (click)="onCellClick($event, column, item, getActualRowIndex(i))">
+            
+            <span class="tableng-cell-content">
+              {{ formatCellValue(item, column) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Spacer for scroll positioning -->
+        <div class="tableng-virtual-spacer-bottom" 
+             [style.height.px]="getBottomSpacerHeight()"></div>
+      </div>
+
+      <!-- Regular (Non-Virtual) Rendering -->
+      <div *ngIf="!loading && data && data.length > 0 && !config?.virtualScrolling" 
+           class="tableng-regular-container">
+        
+        <div *ngFor="let item of data; let i = index; trackBy: trackByFn" 
+             class="tableng-row"
+             [ngClass]="getRowClasses(item, i)"
+             [attr.role]="'row'"
+             [attr.tabindex]="'0'"
+             (click)="onRowClick(item, i)"
+             (keydown)="onRowKeyDown($event, item, i)"
+             (mouseenter)="onRowMouseEnter($event)"
+             (mouseleave)="onRowMouseLeave($event)">
+          
+          <!-- Selection Checkbox -->
+          <div *ngIf="config?.selectable" class="tableng-cell tableng-selection-cell">
+            <input type="checkbox" 
+                   class="tableng-selection-checkbox"
+                   [checked]="isRowSelected(item)"
+                   (change)="onRowSelect($event, item, i)"
+                   (click)="$event.stopPropagation()">
+          </div>
+
+          <!-- Data Cells -->
+          <div *ngFor="let column of columns" 
+               class="tableng-cell"
+               [ngClass]="getCellClasses(column, item)"
+               [style.width.px]="column.width"
+               [attr.role]="'gridcell'"
+               (dblclick)="onCellDoubleClick(column, item, i)"
+               (click)="onCellClick($event, column, item, i)">
+            
+            <span class="tableng-cell-content">
+              {{ formatCellValue(item, column) }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- Spacer for scroll positioning -->
-    <div class="tableng-virtual-spacer-bottom" 
-         [style.height.px]="getBottomSpacerHeight()"></div>
-  </div>
-
-  <!-- Regular (Non-Virtual) Rendering -->
-  <div *ngIf="!loading && data && data.length > 0 && !config?.virtualScrolling" 
-       class="tableng-regular-container">
-    
-    <div *ngFor="let item of data; let i = index; trackBy: trackByFn" 
-         class="tableng-row"
-         [ngClass]="getRowClasses(item, i)"
-         [attr.role]="'row'"
-         [attr.tabindex]="'0'"
-         (click)="onRowClick(item, i)"
-         (keydown)="onRowKeyDown($event, item, i)"
-         (mouseenter)="onRowMouseEnter($event)"
-         (mouseleave)="onRowMouseLeave($event)">
-      
-      <!-- Selection Checkbox -->
-      <div *ngIf="config?.selectable" class="tableng-cell tableng-selection-cell">
-        <input type="checkbox" 
-               class="tableng-selection-checkbox"
-               [checked]="isRowSelected(item)"
-               (change)="onRowSelect($event, item, i)"
-               (click)="$event.stopPropagation()">
-      </div>
-
-      <!-- Data Cells -->
-      <div *ngFor="let column of columns" 
-           class="tableng-cell"
-           [ngClass]="getCellClasses(column, item)"
-           [style.width.px]="column.width"
-           [attr.role]="'gridcell'"
-           (dblclick)="onCellDoubleClick(column, item, i)"
-           (click)="onCellClick($event, column, item, i)">
-        
-        <span class="tableng-cell-content">
-          {{ formatCellValue(item, column) }}
-        </span>
-      </div>
-    </div>
-  </div>
-</div> 
