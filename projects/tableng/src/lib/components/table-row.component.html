@@ -25,7 +25,7 @@
   </td>
   
   <!-- Data Cells -->
-  <td *ngFor="let column of columns; trackBy: trackColumn"
+  <td *ngFor="let column of columns; let first = first; trackBy: trackColumn"
       class="tableng-cell-wrapper"
       role="gridcell">
     <tng-table-cell
@@ -34,10 +34,15 @@
       [rowIndex]="rowIndex"
       [editConfig]="getEditConfig(column)"
       [editable]="editable && column.editable"
+      [isFirstColumn]="first"
+      [level]="rowData.level"
+      [hasChildren]="rowData.children && rowData.children.length > 0"
+      [isExpanded]="rowData.expanded"
       (editStart)="onCellEditStart($event)"
       (editEnd)="onCellEditEnd($event)"
       (valueChange)="onCellValueChange($event)"
-      (editCancel)="onCellEditCancel($event)">
+      (editCancel)="onCellEditCancel($event)"
+      (toggleExpand)="onToggleExpand($event)">
     </tng-table-cell>
   </td>
   

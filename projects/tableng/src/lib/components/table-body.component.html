@@ -69,41 +69,22 @@
       </div>
 
       <!-- Regular (Non-Virtual) Rendering -->
-      <div *ngIf="!loading && data && data.length > 0 && !config?.virtualScrolling" 
-           class="tableng-regular-container">
-        
-        <div *ngFor="let item of data; let i = index; trackBy: trackByFn" 
-             class="tableng-row"
-             [ngClass]="getRowClasses(item, i)"
-             [attr.role]="'row'"
-             [attr.tabindex]="'0'"
-             (click)="onRowClick(item, i)"
-             (keydown)="onRowKeyDown($event, item, i)"
-             (mouseenter)="onRowMouseEnter($event)"
-             (mouseleave)="onRowMouseLeave($event)">
-          
-          <!-- Selection Checkbox -->
-          <div *ngIf="config?.selectable" class="tableng-cell tableng-selection-cell">
-            <input type="checkbox" 
-                   class="tableng-selection-checkbox"
-                   [checked]="isRowSelected(item)"
-                   (change)="onRowSelect($event, item, i)"
-                   (click)="$event.stopPropagation()">
-          </div>
-
-          <!-- Data Cells -->
-          <div *ngFor="let column of columns" 
-               class="tableng-cell"
-               [ngClass]="getCellClasses(column, item)"
-               [style.width.px]="column.width"
-               [attr.role]="'gridcell'"
-               (dblclick)="onCellDoubleClick(column, item, i)"
-               (click)="onCellClick($event, column, item, i)">
-            
-            <span class="tableng-cell-content">
-              {{ formatCellValue(item, column) }}
-            </span>
-          </div>
-        </div>
-      </div>
+      <table *ngIf="!loading && data && data.length > 0 && !config?.virtualScrolling" 
+             class="tableng-regular-container" role="presentation">
+        <tbody role="rowgroup">
+          <tng-table-row *ngFor="let item of data; let i = index; trackBy: trackByFn"
+                         [columns]="columns"
+                         [rowData]="item"
+                         [rowIndex]="i"
+                         [selectable]="config?.selectable || false"
+                         [editable]="config?.editable || false"
+                         [selected]="isRowSelected(item)"
+                         [editConfigs]="editConfigs || {}"
+                         (rowClick)="onRowClick(item, i)"
+                         (rowSelect)="onRowSelect($event, item, i)"
+                         (cellValueChange)="onCellChange($event)"
+                         (toggleExpand)="onToggleExpand($event)">
+          </tng-table-row>
+        </tbody>
+      </table>
     </div>

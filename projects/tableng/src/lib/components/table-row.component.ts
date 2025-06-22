@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { ColumnDefinition } from '../interfaces/column-definition.interface';
 import { CellEditConfig } from '../interfaces/cell-edit-config.interface';
+import { TableRow } from '../interfaces/table-row.interface';
 
 @Component({
   selector: 'tng-table-row',
@@ -9,7 +10,7 @@ import { CellEditConfig } from '../interfaces/cell-edit-config.interface';
 })
 export class TableRowComponent implements OnInit, OnDestroy {
   @Input() columns: ColumnDefinition[] = [];
-  @Input() rowData: Record<string, unknown> | null = {};
+  @Input() rowData!: TableRow<any>;
   @Input() rowIndex!: number;
   @Input() editConfigs: Record<string, CellEditConfig> | null = null;
   @Input() selectable = false;
@@ -18,19 +19,19 @@ export class TableRowComponent implements OnInit, OnDestroy {
 
   @Output() rowClick = new EventEmitter<{
     rowIndex: number;
-    rowData: Record<string, unknown> | null;
+    rowData: TableRow<any>;
     event: MouseEvent | KeyboardEvent;
   }>();
 
   @Output() rowSelect = new EventEmitter<{
     rowIndex: number;
-    rowData: Record<string, unknown> | null;
+    rowData: TableRow<any>;
     selected: boolean;
   }>();
 
   @Output() cellValueChange = new EventEmitter<{
     rowIndex: number;
-    rowData: Record<string, unknown> | null;
+    rowData: TableRow<any>;
     column: string;
     oldValue: unknown;
     newValue: unknown;
@@ -38,8 +39,12 @@ export class TableRowComponent implements OnInit, OnDestroy {
 
   @Output() rowHover = new EventEmitter<{
     rowIndex: number;
-    rowData: Record<string, unknown> | null;
+    rowData: TableRow<any>;
     hovering: boolean;
+  }>();
+
+  @Output() toggleExpand = new EventEmitter<{
+    rowData: TableRow<any>;
   }>();
 
   hovering = false;
@@ -123,10 +128,14 @@ export class TableRowComponent implements OnInit, OnDestroy {
     this.hasEditingCell = false;
   }
 
+  onToggleExpand(event: any): void {
+    this.toggleExpand.emit({ rowData: this.rowData });
+  }
+
   onCellValueChange(event: any): void {
     // Update local row data
-    if (this.rowData && event.column) {
-      this.rowData[event.column] = event.newValue;
+    if (this.rowData && this.rowData.data && event.column) {
+      this.rowData.data[event.column] = event.newValue;
     }
 
     // Emit row-level value change event
@@ -141,10 +150,10 @@ export class TableRowComponent implements OnInit, OnDestroy {
 
   // Helper Methods
   getCellValue(column: ColumnDefinition): any {
-    if (!this.rowData || !column.key) {
+    if (!this.rowData || !this.rowData.data || !column.key) {
       return undefined;
     }
-    return this.rowData[column.key];
+    return this.rowData.data[column.key];
   }
 
   getEditConfig(column: ColumnDefinition): CellEditConfig | null {

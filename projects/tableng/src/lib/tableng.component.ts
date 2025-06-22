@@ -16,6 +16,7 @@ import { ColumnDefinition } from './interfaces/column-definition.interface';
 import { CellEditConfig } from './interfaces/cell-edit-config.interface';
 import { TableStateService, SortState, FilterState } from './services/table-state.service';
 import { LocalStorageService, TableState } from './services/local-storage.service';
+import { TableRow } from './interfaces/table-row.interface';
 
 @Component({
   selector: 'tng-tableng',
@@ -207,6 +208,12 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
     this.rowSelect.emit(event);
     this.cd.markForCheck();
     this.announce(`Row ${event.selected ? 'selected' : 'deselected'}`);
+  }
+
+  onToggleRowExpansion(row: TableRow<any>): void {
+    this.stateService.toggleRowExpansion(row);
+    this.announce(`Row ${row.expanded ? 'collapsed' : 'expanded'}`);
+    this.cd.markForCheck();
   }
 
   onCellChange(event: any): void {

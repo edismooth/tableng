@@ -16,6 +16,19 @@
          [class.tableng-cell-number]="column?.type === 'number'"
          [class.tableng-cell-date]="column?.type === 'date'"
          [class.tableng-cell-boolean]="column?.type === 'boolean'">
+      
+      <!-- Tree Grid Controls -->
+      <div *ngIf="isFirstColumn" class="tableng-tree-controls">
+        <span class="tableng-tree-indent" [style.width.px]="level * 20"></span>
+        <button *ngIf="hasChildren" 
+                class="tableng-tree-toggle"
+                [class.tableng-tree-toggle-expanded]="isExpanded"
+                (click)="onToggleExpand($event)"
+                aria-label="Toggle row expansion">
+          <span class="tableng-tree-toggle-icon">▶</span>
+        </button>
+      </div>
+
       {{ getFormattedValue() }}
     </div>
     

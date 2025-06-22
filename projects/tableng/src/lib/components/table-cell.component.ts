@@ -15,6 +15,10 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() rowIndex!: number;
   @Input() editConfig: CellEditConfig | null = null;
   @Input() editable: boolean = false;
+  @Input() isFirstColumn: boolean = false;
+  @Input() level: number = 0;
+  @Input() hasChildren: boolean = false;
+  @Input() isExpanded: boolean = false;
 
   @Output() editStart = new EventEmitter<{
     column: string;
@@ -39,6 +43,8 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
     column: string;
     rowIndex: number;
   }>();
+
+  @Output() toggleExpand = new EventEmitter<void>();
 
   @ViewChild('editInput') editInput!: ElementRef;
 
@@ -312,5 +318,10 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onMouseLeave(): void {
     this.showEditIndicator = false;
+  }
+
+  onToggleExpand(event: MouseEvent): void {
+    event.stopPropagation(); // Prevent row selection or other parent events
+    this.toggleExpand.emit();
   }
 }

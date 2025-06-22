@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ColumnDefinition } from '../interfaces/column-definition.interface';
 import { TableConfig } from '../interfaces/table-config.interface';
 import { CellEditConfig } from '../interfaces/cell-edit-config.interface';
+import { TableRow } from '../interfaces/table-row.interface';
 
 /**
  * Interface for virtual scrolling configuration
@@ -45,7 +46,7 @@ export interface CellChangeEvent {
 })
 export class TableBodyComponent {
   @Input() columns: ColumnDefinition[] = [];
-  @Input() data: unknown[] = [];
+  @Input() data: TableRow<any>[] = [];
   @Input() config?: TableConfig | null;
   @Input() editConfigs?: Record<string, CellEditConfig>;
   @Input() loading = false;
@@ -57,10 +58,15 @@ export class TableBodyComponent {
   @Output() rowSelect = new EventEmitter<{ row: unknown; selected: boolean; index: number }>();
   @Output() cellEdit = new EventEmitter<CellEditEvent>();
   @Output() cellChange = new EventEmitter<CellChangeEvent>();
+  @Output() toggleRowExpansion = new EventEmitter<TableRow<any>>();
 
   // Event Handlers
   onRowClick(rowData: unknown, index: number): void {
     this.rowClick.emit(rowData);
+  }
+
+  onToggleExpand(event: { rowData: TableRow<any> }): void {
+    this.toggleRowExpansion.emit(event.rowData);
   }
 
   onRowKeyDown(event: KeyboardEvent, rowData: unknown, index: number): void {
@@ -227,8 +233,10 @@ export class TableBodyComponent {
     }
   }
 
-  trackByFn(index: number, item: unknown): unknown {
-    return item;
+  trackByFn(index: number, item: TableRow<any>): unknown {
+    // In tree mode, rows can shift, so we need a stable identifier.
+    // Assuming item.data has a unique 'id' property.
+    return item.data.id ?? index;
   }
 
   // Virtual Scrolling Methods

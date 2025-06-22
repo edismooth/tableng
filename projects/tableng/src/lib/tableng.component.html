@@ -32,7 +32,8 @@
         [selectedRows]="selectedRowsSet"
         (rowClick)="onRowClick($event)"
         (rowSelect)="onRowSelect($event)"
-        (cellChange)="onCellChange($event)">
+        (cellChange)="onCellChange($event)"
+        (toggleRowExpansion)="onToggleRowExpansion($event)">
       </tng-table-body>
     </tbody>
   </table>

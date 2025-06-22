@@ -150,4 +150,37 @@
     font-size: 12px;
     padding: 3px 6px;
   }
+}
+
+/* Tree Grid Styles */
+.tableng-tree-controls {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+}
+
+.tableng-tree-indent {
+  display: inline-block;
+  height: 1px; /* Just to take up space */
+}
+
+.tableng-tree-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 5px;
+
+  .tableng-tree-toggle-icon {
+    transition: transform 0.2s ease-in-out;
+  }
+
+  &.tableng-tree-toggle-expanded .tableng-tree-toggle-icon {
+    transform: rotate(90deg);
+  }
 } 
