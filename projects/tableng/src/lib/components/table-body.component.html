@@ -44,7 +44,7 @@
             <input type="checkbox" 
                    class="tableng-selection-checkbox"
                    [checked]="isRowSelected(item)"
-                   (change)="onRowSelect($event, item, getActualRowIndex(i))"
+                   (change)="onRowSelectVirtual($event, item, getActualRowIndex(i))"
                    (click)="$event.stopPropagation()">
           </div>
 

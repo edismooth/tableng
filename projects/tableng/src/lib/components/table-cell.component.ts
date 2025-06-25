@@ -246,6 +246,20 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.editConfig?.type || this.column?.type || 'text';
   }
 
+  // Get normalized select options
+  getSelectOptions(): { value: string | number; label: string }[] {
+    if (!this.editConfig?.options) {
+      return [];
+    }
+
+    return this.editConfig.options.map(option => {
+      if (typeof option === 'string') {
+        return { value: option, label: option };
+      }
+      return option;
+    });
+  }
+
   // Date input helpers
   getDateInputValue(): string {
     if (!this.cellControl.value) return '';

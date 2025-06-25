@@ -76,7 +76,15 @@ export class TableBodyComponent {
     }
   }
 
-  onRowSelect(event: Event, rowData: unknown, index: number): void {
+  onRowSelect(eventData: { rowIndex: number; rowData: TableRow<any>; selected: boolean }, rowData: TableRow<any>, index: number): void {
+    this.rowSelect.emit({
+      row: eventData.rowData,
+      selected: eventData.selected,
+      index: eventData.rowIndex
+    });
+  }
+
+  onRowSelectVirtual(event: Event, rowData: TableRow<any>, index: number): void {
     const target = event.target as HTMLInputElement;
     const selected = target.checked;
 
@@ -233,14 +241,18 @@ export class TableBodyComponent {
     }
   }
 
-  trackByFn(index: number, item: TableRow<any>): unknown {
+  trackByFn = (index: number, item: TableRow<any>): unknown => {
     // In tree mode, rows can shift, so we need a stable identifier.
-    // Assuming item.data has a unique 'id' property.
-    return item.data.id ?? index;
+    // Try to get a unique identifier from the data, fallback to index
+    if (item && item.data && typeof item.data === 'object') {
+      const data = item.data as any;
+      return data.id ?? data._id ?? index;
+    }
+    return index;
   }
 
   // Virtual Scrolling Methods
-  getVisibleData(): unknown[] {
+  getVisibleData(): TableRow<any>[] {
     if (!this.config?.virtualScrolling || !this.virtualScrollConfig) {
       return this.data;
     }

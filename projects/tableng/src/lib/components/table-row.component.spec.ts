@@ -5,6 +5,7 @@ import { TableRowComponent } from './table-row.component';
 import { TableCellComponent } from './table-cell.component';
 import { ColumnDefinition } from '../interfaces/column-definition.interface';
 import { CellEditConfig } from '../interfaces/cell-edit-config.interface';
+import { TableRow } from '../interfaces/table-row.interface';
 
 describe('TableRowComponent', () => {
   let component: TableRowComponent;
@@ -17,11 +18,15 @@ describe('TableRowComponent', () => {
     { key: 'active', title: 'Active', type: 'boolean', width: 100, editable: true }
   ];
 
-  const mockRowData: any = {
-    id: 1,
-    name: 'John Doe',
-    email: 'john@example.com',
-    active: true
+  const mockRowData: TableRow<any> = {
+    data: {
+      id: 1,
+      name: 'John Doe',
+      email: 'john@example.com',
+      active: true
+    },
+    level: 0,
+    expanded: false
   };
 
   const mockEditConfigs: Record<string, CellEditConfig> = {
@@ -100,7 +105,7 @@ describe('TableRowComponent', () => {
         const column = mockColumns[index];
         
         expect(cellComponent.column).toEqual(column);
-        expect(cellComponent.value).toBe(mockRowData[column.key]);
+        expect(cellComponent.value).toBe(mockRowData.data[column.key]);
         expect(cellComponent.rowIndex).toBe(0);
       });
     });
@@ -350,7 +355,7 @@ describe('TableRowComponent', () => {
         newValue: 'Jane Doe'
       });
 
-      expect(component.rowData?.['name']).toBe('Jane Doe');
+      expect(component.rowData?.data?.['name']).toBe('Jane Doe');
     });
 
     it('should apply editing styling when a cell is being edited', () => {
@@ -390,7 +395,10 @@ describe('TableRowComponent', () => {
         width: 150
       };
       component.columns = [...mockColumns, newColumn];
-      component.rowData = { ...mockRowData, created: new Date() };
+      component.rowData = {
+        ...mockRowData,
+        data: { ...mockRowData.data, created: new Date() }
+      };
       fixture.detectChanges();
 
       const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
@@ -430,7 +438,7 @@ describe('TableRowComponent', () => {
 
   describe('Error Handling', () => {
     it('should handle null row data gracefully', () => {
-      component.rowData = null;
+      component.rowData = null as any;
       
       expect(() => {
         fixture.detectChanges();
@@ -438,7 +446,7 @@ describe('TableRowComponent', () => {
     });
 
     it('should handle undefined row data gracefully', () => {
-      component.rowData = null;
+      component.rowData = null as any;
       
       expect(() => {
         fixture.detectChanges();
@@ -465,7 +473,7 @@ describe('TableRowComponent', () => {
     });
 
     it('should handle row data with missing properties', () => {
-      component.rowData = { id: 1 }; // Missing name, email, active
+      component.rowData = { data: { id: 1 }, level: 0, expanded: false }; // Missing name, email, active
       
       expect(() => {
         fixture.detectChanges();

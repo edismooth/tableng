@@ -79,7 +79,7 @@
             [attr.aria-label]="'Edit ' + column?.title"
             (keydown)="onEditKeyDown($event)"
             (blur)="onBlur()">
-      <option *ngFor="let option of editConfig?.options" [value]="option.value">
+      <option *ngFor="let option of getSelectOptions()" [value]="option.value">
         {{ option.label }}
       </option>
     </select>
