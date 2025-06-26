@@ -61,7 +61,7 @@ export class TableBodyComponent {
   @Output() toggleRowExpansion = new EventEmitter<TableRow<any>>();
 
   // Event Handlers
-  onRowClick(rowData: unknown, index: number): void {
+  onRowClick(rowData: unknown, _index: number): void {
     this.rowClick.emit(rowData);
   }
 
@@ -69,14 +69,14 @@ export class TableBodyComponent {
     this.toggleRowExpansion.emit(event.rowData);
   }
 
-  onRowKeyDown(event: KeyboardEvent, rowData: unknown, index: number): void {
+  onRowKeyDown(event: KeyboardEvent, rowData: unknown, _index: number): void {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       this.rowClick.emit(rowData);
     }
   }
 
-  onRowSelect(eventData: { rowIndex: number; rowData: TableRow<any>; selected: boolean }, rowData: TableRow<any>, index: number): void {
+  onRowSelect(eventData: { rowIndex: number; rowData: TableRow<any>; selected: boolean }, _rowData: TableRow<any>, _index: number): void {
     this.rowSelect.emit({
       row: eventData.rowData,
       selected: eventData.selected,
@@ -107,7 +107,7 @@ export class TableBodyComponent {
     target.classList.remove('tableng-row-hover');
   }
 
-  onCellClick(event: Event, column: ColumnDefinition, rowData: unknown, rowIndex: number): void {
+  onCellClick(event: Event, _column: ColumnDefinition, _rowData: unknown, _rowIndex: number): void {
     // Basic cell click handling
     event.stopPropagation();
   }
@@ -159,7 +159,7 @@ export class TableBodyComponent {
     return classes;
   }
 
-  getRowClasses(rowData: unknown, index: number): string[] {
+  getRowClasses(rowData: unknown, _index: number): string[] {
     const classes = ['tableng-row'];
     
     if (this.isRowSelected(rowData)) {
@@ -169,7 +169,7 @@ export class TableBodyComponent {
     return classes;
   }
 
-  getCellClasses(column: ColumnDefinition, rowData: unknown): string[] {
+  getCellClasses(column: ColumnDefinition, _rowData: unknown): string[] {
     const classes = ['tableng-cell'];
     
     // Add type-specific classes
@@ -263,12 +263,12 @@ export class TableBodyComponent {
     return this.data.slice(start, end);
   }
 
-  getActualRowIndex(visibleIndex: number): number {
+  getActualRowIndex(_visibleIndex: number): number {
     if (!this.config?.virtualScrolling || !this.virtualScrollConfig) {
-      return visibleIndex;
+      return _visibleIndex;
     }
 
-    return this.virtualScrollConfig.startIndex + visibleIndex;
+    return this.virtualScrollConfig.startIndex + _visibleIndex;
   }
 
   getVirtualScrollHeight(): number {

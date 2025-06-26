@@ -49,13 +49,12 @@ export class TableRowComponent implements OnInit, OnDestroy {
 
   hovering = false;
   hasEditingCell = false;
-
   ngOnInit(): void {
-    // Component initialization
+    // Initialize component
   }
 
   ngOnDestroy(): void {
-    // Component cleanup
+    // Cleanup component
   }
 
   // Event Handlers
@@ -116,19 +115,19 @@ export class TableRowComponent implements OnInit, OnDestroy {
   }
 
   // Cell Event Handlers
-  onCellEditStart(event: any): void {
+  onCellBlur(_event: any): void {
     this.hasEditingCell = true;
   }
 
-  onCellEditEnd(event: any): void {
+  onCellCancel(_event: any): void {
     this.hasEditingCell = false;
   }
 
-  onCellEditCancel(event: any): void {
+  onCellEditCancel(_event: any): void {
     this.hasEditingCell = false;
   }
 
-  onToggleExpand(event: any): void {
+  onToggleExpand(_event: any): void {
     this.toggleExpand.emit({ rowData: this.rowData });
   }
 

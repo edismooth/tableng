@@ -1,4 +1,4 @@
-import { CellEditConfig, EditType } from './cell-edit-config.interface';
+import { CellEditConfig } from './cell-edit-config.interface';
 
 describe('CellEditConfig Interface', () => {
   describe('Type Structure', () => {
