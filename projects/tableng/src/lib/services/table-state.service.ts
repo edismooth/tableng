@@ -16,9 +16,7 @@ export interface SortState {
 /**
  * Filter state for table columns
  */
-export interface FilterState {
-  [columnKey: string]: string;
-}
+export type FilterState = Record<string, string>;
 
 /**
  * Service for managing table state including data, sorting, filtering, and column configuration

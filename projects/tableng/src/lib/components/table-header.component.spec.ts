@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { TableHeaderComponent } from './table-header.component';
 import { ColumnDefinition } from '../interfaces/column-definition.interface';
@@ -334,7 +333,7 @@ describe('TableHeaderComponent', () => {
       const sortableHeader = fixture.debugElement.query(By.css('.tableng-sortable'));
       
       // Simulate Enter key press
-      sortableHeader.triggerEventHandler('keydown', { key: 'Enter', preventDefault: () => {} });
+      sortableHeader.triggerEventHandler('keydown', { key: 'Enter', preventDefault: () => { /* prevent default */ } });
       
       expect(emittedSortData).toBeDefined();
     });

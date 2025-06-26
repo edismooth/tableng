@@ -54,8 +54,11 @@
                [ngClass]="getCellClasses(column, item)"
                [style.width.px]="column.width"
                [attr.role]="'gridcell'"
+               [attr.tabindex]="'0'"
                (dblclick)="onCellDoubleClick(column, item, getActualRowIndex(i))"
-               (click)="onCellClick($event, column, item, getActualRowIndex(i))">
+               (click)="onCellClick($event, column, item, getActualRowIndex(i))"
+               (keydown.enter)="onCellClick($event, column, item, getActualRowIndex(i))"
+               (keydown.space)="onCellClick($event, column, item, getActualRowIndex(i))">
             
             <span class="tableng-cell-content">
               {{ formatCellValue(item, column) }}

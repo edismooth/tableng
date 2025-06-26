@@ -244,7 +244,7 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
     // Subscribe to sort state changes
     this.stateService.sortState$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(state => {
+      .subscribe(_state => {
         // Sort state is now handled by the getter
         this.cd.markForCheck();
       });
@@ -277,7 +277,7 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
       }));
   }
 
-  private restoreState(state: TableState): void {
+  private restoreState(_state: TableState): void {
     // State restoration is handled by the state service
     // Just update our local view
     this.updateVisibleColumns();

@@ -31,6 +31,13 @@ module.exports = tseslint.config(
           style: "kebab-case",
         },
       ],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+      "@angular-eslint/no-empty-lifecycle-method": "warn",
+      "@angular-eslint/prefer-inject": "warn",
+      "@typescript-eslint/no-empty-function": "warn",
+      "@typescript-eslint/no-inferrable-types": "off",
+      "@typescript-eslint/consistent-indexed-object-style": "warn",
     },
   },
   {
@@ -44,7 +51,14 @@ module.exports = tseslint.config(
     },
     rules: {
       "tailwindcss/classnames-order": "warn",
-      "tailwindcss/no-custom-classname": "warn",
+      "tailwindcss/no-custom-classname": [
+        "warn",
+        {
+          "whitelist": [
+            "tableng-.*"
+          ]
+        }
+      ],
       "tailwindcss/no-contradicting-classname": "error",
     },
   }

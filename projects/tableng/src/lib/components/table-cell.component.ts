@@ -14,11 +14,11 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() value: unknown;
   @Input() rowIndex!: number;
   @Input() editConfig: CellEditConfig | null = null;
-  @Input() editable: boolean = false;
-  @Input() isFirstColumn: boolean = false;
-  @Input() level: number = 0;
-  @Input() hasChildren: boolean = false;
-  @Input() isExpanded: boolean = false;
+  @Input() editable = false;
+  @Input() isFirstColumn = false;
+  @Input() level = 0;
+  @Input() hasChildren = false;
+  @Input() isExpanded = false;
 
   @Output() editStart = new EventEmitter<{
     column: string;
@@ -48,10 +48,10 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('editInput') editInput!: ElementRef;
 
-  isEditing: boolean = false;
+  isEditing = false;
   originalValue: unknown;
   cellControl!: FormControl;
-  showEditIndicator: boolean = false;
+  showEditIndicator = false;
 
   constructor(private cd: ChangeDetectorRef) {}
 
@@ -94,7 +94,7 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
         default:
           return String(this.value);
       }
-    } catch (error) {
+    } catch {
       return String(this.value || '');
     }
   }
@@ -303,15 +303,15 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  onInputChange(event: Event): void {
+  onInputChange(_event: Event): void {
     // Value is handled by form control
   }
 
-  onSelectChange(event: Event): void {
+  onSelectChange(_event: Event): void {
     // Value is handled by form control
   }
 
-  onCheckboxChange(event: Event): void {
+  onCheckboxChange(_event: Event): void {
     // Value is handled by form control
   }
 

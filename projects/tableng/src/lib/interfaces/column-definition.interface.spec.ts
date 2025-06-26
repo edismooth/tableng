@@ -1,4 +1,4 @@
-import { ColumnDefinition, ColumnType, SortDirection } from './column-definition.interface';
+import { ColumnDefinition } from './column-definition.interface';
 import { CellEditConfig } from './cell-edit-config.interface';
 
 describe('ColumnDefinition Interface', () => {

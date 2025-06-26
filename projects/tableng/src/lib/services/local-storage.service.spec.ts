@@ -4,7 +4,7 @@ import { TableConfig } from '../interfaces/table-config.interface';
 
 describe('LocalStorageService', () => {
   let service: LocalStorageService;
-  let mockLocalStorage: { [key: string]: string };
+  let mockLocalStorage: Record<string, string>;
 
   const mockTableConfig: TableConfig = {
     tableId: 'test-table',
