@@ -122,6 +122,14 @@ export class TableRowComponent implements OnInit, OnDestroy {
   }
 
   // Cell Event Handlers
+  onCellEditStart(_event: any): void {
+    this.hasEditingCell = true;
+  }
+
+  onCellEditEnd(_event: any): void {
+    this.hasEditingCell = false;
+  }
+
   onCellBlur(_event: any): void {
     this.hasEditingCell = true;
   }
