@@ -259,7 +259,10 @@ jobs:
       - name: Validate package.json
         run: |
           cd dist/tableng
-          npm pkg validate
+          # Check if package.json is valid JSON and has required fields
+          node -e "const pkg = require('./package.json'); console.log('Package name:', pkg.name); console.log('Version:', pkg.version); if (!pkg.name || !pkg.version) throw new Error('Missing required fields')"
+          # Check if package can be packed without errors
+          npm pack --dry-run
 
   all-checks:
     name: All Checks Passed
