@@ -1,4 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
 import { ColumnDefinition } from '../interfaces/column-definition.interface';
 import { CellEditConfig } from '../interfaces/cell-edit-config.interface';
 import { TableRow } from '../interfaces/table-row.interface';
@@ -6,7 +13,7 @@ import { TableRow } from '../interfaces/table-row.interface';
 @Component({
   selector: 'tng-table-row',
   templateUrl: './table-row.component.html',
-  styleUrls: ['./table-row.component.scss']
+  styleUrls: ['./table-row.component.scss'],
 })
 export class TableRowComponent implements OnInit, OnDestroy {
   @Input() columns: ColumnDefinition[] = [];
@@ -62,7 +69,7 @@ export class TableRowComponent implements OnInit, OnDestroy {
     this.rowClick.emit({
       rowIndex: this.rowIndex,
       rowData: this.rowData,
-      event: event
+      event: event,
     });
   }
 
@@ -73,7 +80,7 @@ export class TableRowComponent implements OnInit, OnDestroy {
         this.rowClick.emit({
           rowIndex: this.rowIndex,
           rowData: this.rowData,
-          event: event
+          event: event,
         });
         break;
       case ' ':
@@ -90,7 +97,7 @@ export class TableRowComponent implements OnInit, OnDestroy {
     this.rowHover.emit({
       rowIndex: this.rowIndex,
       rowData: this.rowData,
-      hovering: true
+      hovering: true,
     });
   }
 
@@ -99,22 +106,30 @@ export class TableRowComponent implements OnInit, OnDestroy {
     this.rowHover.emit({
       rowIndex: this.rowIndex,
       rowData: this.rowData,
-      hovering: false
+      hovering: false,
     });
   }
 
   onSelectionChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.selected = target.checked;
-    
+
     this.rowSelect.emit({
       rowIndex: this.rowIndex,
       rowData: this.rowData,
-      selected: this.selected
+      selected: this.selected,
     });
   }
 
   // Cell Event Handlers
+  onCellEditStart(_event: any): void {
+    this.hasEditingCell = true;
+  }
+
+  onCellEditEnd(_event: any): void {
+    this.hasEditingCell = false;
+  }
+
   onCellBlur(_event: any): void {
     this.hasEditingCell = true;
   }
@@ -143,7 +158,7 @@ export class TableRowComponent implements OnInit, OnDestroy {
       rowData: this.rowData,
       column: event.column,
       oldValue: event.oldValue,
-      newValue: event.newValue
+      newValue: event.newValue,
     });
   }
 
@@ -167,7 +182,7 @@ export class TableRowComponent implements OnInit, OnDestroy {
     this.rowSelect.emit({
       rowIndex: this.rowIndex,
       rowData: this.rowData,
-      selected: this.selected
+      selected: this.selected,
     });
   }
 

@@ -12,8 +12,14 @@ describe('TableStateService', () => {
     tableId: 'test-table',
     columns: [
       { key: 'id', title: 'ID', type: 'text', sortable: true },
-      { key: 'name', title: 'Name', type: 'text', sortable: true, filterable: true },
-      { key: 'age', title: 'Age', type: 'number', sortable: true }
+      {
+        key: 'name',
+        title: 'Name',
+        type: 'text',
+        sortable: true,
+        filterable: true,
+      },
+      { key: 'age', title: 'Age', type: 'number', sortable: true },
     ],
     treeMode: false,
     virtualScrolling: true,
@@ -21,13 +27,13 @@ describe('TableStateService', () => {
     sorting: true,
     filtering: true,
     resizable: true,
-    reorderable: true
+    reorderable: true,
   };
 
   const mockData = [
     { id: '1', name: 'John', age: 30 },
     { id: '2', name: 'Jane', age: 25 },
-    { id: '3', name: 'Bob', age: 35 }
+    { id: '3', name: 'Bob', age: 35 },
   ];
 
   beforeEach(() => {
@@ -41,18 +47,20 @@ describe('TableStateService', () => {
       exportTableStates: jest.fn().mockReturnValue('{}'),
       importTableStates: jest.fn(),
       getStorageSize: jest.fn().mockReturnValue(0),
-      clearExpiredStates: jest.fn()
+      clearExpiredStates: jest.fn(),
     };
 
     TestBed.configureTestingModule({
       providers: [
         TableStateService,
-        { provide: LocalStorageService, useValue: localStorageSpy }
-      ]
+        { provide: LocalStorageService, useValue: localStorageSpy },
+      ],
     });
 
     service = TestBed.inject(TableStateService);
-    mockLocalStorageService = TestBed.inject(LocalStorageService) as jest.Mocked<LocalStorageService>;
+    mockLocalStorageService = TestBed.inject(
+      LocalStorageService
+    ) as jest.Mocked<LocalStorageService>;
   });
 
   it('should be created', () => {
@@ -73,7 +81,7 @@ describe('TableStateService', () => {
         config: mockTableConfig,
         columnOrder: ['name', 'id', 'age'],
         columnWidths: { id: 150, name: 250 },
-        sortState: { column: 'name', direction: 'asc' as const }
+        sortState: { column: 'name', direction: 'asc' as const },
       };
       mockLocalStorageService.loadTableState.mockReturnValue(persistedState);
       const configWithTree = { ...mockTableConfig, treeMode: false };
@@ -92,8 +100,14 @@ describe('TableStateService', () => {
         tableId: 'test-table',
         columns: [
           { key: 'id', title: 'ID', type: 'text', sortable: true },
-          { key: 'name', title: 'Name', type: 'text', sortable: true, filterable: true },
-          { key: 'age', title: 'Age', type: 'number', sortable: true }
+          {
+            key: 'name',
+            title: 'Name',
+            type: 'text',
+            sortable: true,
+            filterable: true,
+          },
+          { key: 'age', title: 'Age', type: 'number', sortable: true },
         ],
         treeMode: false,
         virtualScrolling: true,
@@ -101,7 +115,7 @@ describe('TableStateService', () => {
         sorting: true,
         filtering: true,
         resizable: true,
-        reorderable: true
+        reorderable: true,
       };
       service.initializeTable(freshConfig, mockData);
     });
@@ -113,7 +127,7 @@ describe('TableStateService', () => {
 
     it('should reorder columns', () => {
       service.reorderColumns(['name', 'age', 'id']);
-      
+
       expect(service.getColumnOrder()).toEqual(['name', 'age', 'id']);
     });
 
@@ -124,21 +138,21 @@ describe('TableStateService', () => {
 
     it('should set column width', () => {
       service.setColumnWidth('name', 200);
-      
+
       const widths = service.getColumnWidths();
       expect(widths['name']).toBe(200);
     });
 
     it('should toggle column visibility', () => {
       service.toggleColumnVisibility('name', false);
-      
+
       const allColumns = service.getAllColumns();
       expect(allColumns.find(col => col.key === 'name')?.visible).toBe(false);
     });
 
     it('should get visible columns only', () => {
       service.toggleColumnVisibility('age', false);
-      
+
       const visibleColumns = service.getVisibleColumns();
       expect(visibleColumns.length).toBe(2);
       expect(visibleColumns.find(col => col.key === 'age')).toBeUndefined();
@@ -152,10 +166,10 @@ describe('TableStateService', () => {
 
     it('should sort by column ascending', () => {
       service.sortByColumn('name', 'asc');
-      
+
       const sortState = service.getSortState();
       expect(sortState).toEqual({ column: 'name', direction: 'asc' });
-      
+
       const visibleData = service.getVisibleData();
       expect(visibleData[0].data.name).toBe('Bob');
       expect(visibleData[1].data.name).toBe('Jane');
@@ -164,10 +178,10 @@ describe('TableStateService', () => {
 
     it('should sort by column descending', () => {
       service.sortByColumn('age', 'desc');
-      
+
       const sortState = service.getSortState();
       expect(sortState).toEqual({ column: 'age', direction: 'desc' });
-      
+
       const visibleData = service.getVisibleData();
       expect(visibleData[0].data.age).toBe(35);
       expect(visibleData[1].data.age).toBe(30);
@@ -177,10 +191,10 @@ describe('TableStateService', () => {
     it('should clear sort when sorting by same column with none direction', () => {
       service.sortByColumn('name', 'asc');
       service.sortByColumn('name', 'none');
-      
+
       const sortState = service.getSortState();
       expect(sortState).toBeNull();
-      
+
       const visibleData = service.getVisibleData();
       expect(visibleData.map(r => r.data)).toEqual(mockData);
     });
@@ -189,11 +203,11 @@ describe('TableStateService', () => {
       // First click: asc
       service.cycleSortDirection('name');
       expect(service.getSortState()?.direction).toBe('asc');
-      
+
       // Second click: desc
       service.cycleSortDirection('name');
       expect(service.getSortState()?.direction).toBe('desc');
-      
+
       // Third click: none
       service.cycleSortDirection('name');
       expect(service.getSortState()).toBeNull();
@@ -207,10 +221,10 @@ describe('TableStateService', () => {
 
     it('should filter by column value', () => {
       service.setColumnFilter('name', 'Jo');
-      
+
       const filterState = service.getFilterState();
       expect(filterState['name']).toBe('Jo');
-      
+
       const visibleData = service.getVisibleData();
       expect(visibleData.length).toBe(1);
       expect(visibleData[0].data.name).toBe('John');
@@ -219,7 +233,7 @@ describe('TableStateService', () => {
     it('should filter by multiple columns', () => {
       service.setColumnFilter('name', 'J');
       service.setColumnFilter('age', '30');
-      
+
       const visibleData = service.getVisibleData();
       expect(visibleData.length).toBe(1);
       expect(visibleData[0].data.name).toBe('John');
@@ -228,10 +242,10 @@ describe('TableStateService', () => {
     it('should clear single column filter', () => {
       service.setColumnFilter('name', 'Jo');
       service.clearColumnFilter('name');
-      
+
       const filterState = service.getFilterState();
       expect(filterState['name']).toBeUndefined();
-      
+
       const visibleData = service.getVisibleData();
       expect(visibleData.length).toBe(3);
     });
@@ -240,10 +254,10 @@ describe('TableStateService', () => {
       service.setColumnFilter('name', 'Jo');
       service.setColumnFilter('age', '30');
       service.clearAllFilters();
-      
+
       const filterState = service.getFilterState();
       expect(Object.keys(filterState).length).toBe(0);
-      
+
       const visibleData = service.getVisibleData();
       expect(visibleData.length).toBe(3);
     });
@@ -256,16 +270,13 @@ describe('TableStateService', () => {
 
     it('should apply filters first, then sorting', () => {
       // Add more test data
-      const extendedData = [
-        ...mockData,
-        { id: '4', name: 'Jack', age: 28 }
-      ];
+      const extendedData = [...mockData, { id: '4', name: 'Jack', age: 28 }];
       service.updateData(extendedData);
-      
+
       // Filter by names starting with 'J', then sort by age
       service.setColumnFilter('name', 'J');
       service.sortByColumn('age', 'asc');
-      
+
       const visibleData = service.getVisibleData();
       expect(visibleData.length).toBe(3); // John, Jane, Jack
       expect(visibleData[0].data.name).toBe('Jane'); // age 25
@@ -280,26 +291,21 @@ describe('TableStateService', () => {
     });
 
     it('should update data and refresh visible data', () => {
-      const newData = [
-        { id: '5', name: 'Alice', age: 40 }
-      ];
-      
+      const newData = [{ id: '5', name: 'Alice', age: 40 }];
+
       service.updateData(newData);
-      
+
       expect(service.getData().map(r => r.data)).toEqual(newData);
       expect(service.getVisibleData().map(r => r.data)).toEqual(newData);
     });
 
     it('should preserve filters when updating data', () => {
       service.setColumnFilter('name', 'Jo');
-      
-      const newData = [
-        ...mockData,
-        { id: '4', name: 'Joe', age: 45 }
-      ];
-      
+
+      const newData = [...mockData, { id: '4', name: 'Joe', age: 45 }];
+
       service.updateData(newData);
-      
+
       const visibleData = service.getVisibleData();
       expect(visibleData.length).toBe(2); // John and Joe
     });
@@ -310,39 +316,39 @@ describe('TableStateService', () => {
       service.initializeTable(mockTableConfig, mockData);
     });
 
-    it('should emit config changes', (done) => {
+    it('should emit config changes', done => {
       service.config$.subscribe(config => {
         expect(config).toEqual(mockTableConfig);
         done();
       });
     });
 
-    it('should emit visible data changes', (done) => {
+    it('should emit visible data changes', done => {
       service.visibleData$.subscribe(data => {
         expect(data.map(r => r.data)).toEqual(mockData);
         done();
       });
     });
 
-    it('should emit sort state changes', (done) => {
+    it('should emit sort state changes', done => {
       service.sortState$.subscribe(sortState => {
         if (sortState) {
           expect(sortState).toEqual({ column: 'name', direction: 'asc' });
           done();
         }
       });
-      
+
       service.sortByColumn('name', 'asc');
     });
 
-    it('should emit filter state changes', (done) => {
+    it('should emit filter state changes', done => {
       service.filterState$.subscribe(filterState => {
         if (Object.keys(filterState).length > 0) {
           expect(filterState['name']).toBe('Jo');
           done();
         }
       });
-      
+
       service.setColumnFilter('name', 'Jo');
     });
   });
@@ -361,8 +367,8 @@ describe('TableStateService', () => {
               data: { id: '1.1', name: 'Child 1.1' },
               level: 1,
               expanded: false,
-            }
-          ]
+            },
+          ],
         },
         {
           data: { id: '2', name: 'Root 2' },
@@ -373,9 +379,9 @@ describe('TableStateService', () => {
               data: { id: '2.1', name: 'Child 2.1' },
               level: 1,
               expanded: false,
-            }
-          ]
-        }
+            },
+          ],
+        },
       ];
       const treeConfig: TableConfig = { ...mockTableConfig, treeMode: true };
       service.initializeTable(treeConfig, treeData);
@@ -413,4 +419,4 @@ describe('TableStateService', () => {
       expect(otherRow.expanded).toBe(true); // Should remain unchanged
     });
   });
-}); 
+});

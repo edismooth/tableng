@@ -19,7 +19,7 @@ export interface TableState {
  * Handles saving/loading column arrangements, filters, sorting, and other table configurations
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LocalStorageService {
   private readonly storagePrefix = 'tableng_';
@@ -49,7 +49,7 @@ export class LocalStorageService {
     try {
       const key = this.getStorageKey(tableId);
       const serializedState = localStorage.getItem(key);
-      
+
       if (!serializedState) {
         return null;
       }
@@ -75,7 +75,7 @@ export class LocalStorageService {
    */
   clearAllTableStates(): void {
     const keysToRemove: string[] = [];
-    
+
     // Collect all tableng keys
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -83,7 +83,7 @@ export class LocalStorageService {
         keysToRemove.push(key);
       }
     }
-    
+
     // Remove collected keys
     keysToRemove.forEach(key => localStorage.removeItem(key));
   }
@@ -94,7 +94,7 @@ export class LocalStorageService {
    */
   getAllTableIds(): string[] {
     const tableIds: string[] = [];
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith(this.storagePrefix)) {
@@ -102,7 +102,7 @@ export class LocalStorageService {
         tableIds.push(tableId);
       }
     }
-    
+
     return tableIds;
   }
 
@@ -122,7 +122,7 @@ export class LocalStorageService {
    */
   getStorageSize(): number {
     let totalSize = 0;
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith(this.storagePrefix)) {
@@ -133,7 +133,7 @@ export class LocalStorageService {
         }
       }
     }
-    
+
     return totalSize;
   }
 
@@ -143,7 +143,7 @@ export class LocalStorageService {
    */
   exportTableStates(): Record<string, TableState> {
     const states: Record<string, TableState> = {};
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith(this.storagePrefix)) {
@@ -154,7 +154,7 @@ export class LocalStorageService {
         }
       }
     }
-    
+
     return states;
   }
 
@@ -180,4 +180,4 @@ export class LocalStorageService {
   private getStorageKey(tableId: string): string {
     return `${this.storagePrefix}${tableId}`;
   }
-} 
+}

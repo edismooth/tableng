@@ -1,33 +1,38 @@
-<tr class="tableng-row"
-    [class.tableng-row-selectable]="selectable"
-    [class.tableng-row-selected]="selected"
-    [class.tableng-row-hover]="hovering"
-    [class.tableng-row-editing]="hasEditingCell"
-    [class.tableng-row-even]="rowIndex % 2 === 0"
-    [class.tableng-row-odd]="rowIndex % 2 === 1"
-    role="row"
-    tabindex="0"
-    [attr.aria-selected]="selected"
-    [attr.aria-describedby]="'row-' + rowIndex + '-description'"
-    (click)="onRowClick($event)"
-    (keydown)="onKeyDown($event)"
-    (mouseenter)="onMouseEnter()"
-    (mouseleave)="onMouseLeave()">
-  
+<tr
+  class="tableng-row"
+  [class.tableng-row-selectable]="selectable"
+  [class.tableng-row-selected]="selected"
+  [class.tableng-row-hover]="hovering"
+  [class.tableng-row-editing]="hasEditingCell"
+  [class.tableng-row-even]="rowIndex % 2 === 0"
+  [class.tableng-row-odd]="rowIndex % 2 === 1"
+  role="row"
+  tabindex="0"
+  [attr.aria-selected]="selected"
+  [attr.aria-describedby]="'row-' + rowIndex + '-description'"
+  (click)="onRowClick($event)"
+  (keydown)="onKeyDown($event)"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+>
   <!-- Selection Column -->
   <td *ngIf="selectable" class="tableng-row-selector" role="gridcell">
-    <input type="checkbox"
-           class="tableng-row-checkbox"
-           [checked]="selected"
-           [attr.aria-label]="'Select row ' + (rowIndex + 1)"
-           (change)="onSelectionChange($event)"
-           (click)="$event.stopPropagation()" />
+    <input
+      type="checkbox"
+      class="tableng-row-checkbox"
+      [checked]="selected"
+      [attr.aria-label]="'Select row ' + (rowIndex + 1)"
+      (change)="onSelectionChange($event)"
+      (click)="$event.stopPropagation()"
+    />
   </td>
-  
+
   <!-- Data Cells -->
-  <td *ngFor="let column of columns; let first = first; trackBy: trackColumn"
-      class="tableng-cell-wrapper"
-      role="gridcell">
+  <td
+    *ngFor="let column of columns; let first = first; trackBy: trackColumn"
+    class="tableng-cell-wrapper"
+    role="gridcell"
+  >
     <tng-table-cell
       [column]="column"
       [value]="getCellValue(column)"
@@ -42,12 +47,13 @@
       (editEnd)="onCellEditEnd($event)"
       (valueChange)="onCellValueChange($event)"
       (editCancel)="onCellEditCancel($event)"
-      (toggleExpand)="onToggleExpand($event)">
-    </tng-table-cell>
+      (toggleExpand)="onToggleExpand($event)"
+    ></tng-table-cell>
   </td>
-  
+
   <!-- Hidden screen reader description -->
   <span [id]="'row-' + rowIndex + '-description'" class="tableng-sr-only">
-    Row {{ rowIndex + 1 }}{{ selected ? ', selected' : '' }}{{ hasEditingCell ? ', editing' : '' }}
+    Row {{ rowIndex + 1 }}{{ selected ? ', selected' : ''
+    }}{{ hasEditingCell ? ', editing' : '' }}
   </span>
-</tr> 
+</tr>

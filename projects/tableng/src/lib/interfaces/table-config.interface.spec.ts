@@ -7,21 +7,21 @@ describe('TableConfig Interface', () => {
     it('should allow a minimal valid configuration', () => {
       const config: TableConfig = {
         tableId: 'test-table',
-        columns: []
+        columns: [],
       };
-      
+
       expect(config.tableId).toBe('test-table');
       expect(config.columns).toEqual([]);
     });
 
     it('should allow a complete configuration with all optional properties', () => {
       const mockColumns: ColumnDefinition[] = [
-        { key: 'id', title: 'ID', type: 'text' }
+        { key: 'id', title: 'ID', type: 'text' },
       ];
-      
+
       const mockTheme: TableTheme = {
         name: 'custom',
-        colors: { primary: '#000' }
+        colors: { primary: '#000' },
       };
 
       const config: TableConfig = {
@@ -38,7 +38,7 @@ describe('TableConfig Interface', () => {
         resizable: true,
         reorderable: true,
         rowHeight: 40,
-        headerHeight: 50
+        headerHeight: 50,
       };
 
       expect(config.tableId).toBe('complete-table');
@@ -55,7 +55,7 @@ describe('TableConfig Interface', () => {
       const config: TableConfig = {
         tableId: 'themed-table',
         columns: [],
-        theme: 'dark'
+        theme: 'dark',
       };
 
       expect(config.theme).toBe('dark');
@@ -64,13 +64,13 @@ describe('TableConfig Interface', () => {
     it('should allow theme as TableTheme object', () => {
       const customTheme: TableTheme = {
         name: 'custom',
-        colors: { primary: '#ff0000' }
+        colors: { primary: '#ff0000' },
       };
 
       const config: TableConfig = {
         tableId: 'custom-themed-table',
         columns: [],
-        theme: customTheme
+        theme: customTheme,
       };
 
       expect(config.theme).toBe(customTheme);
@@ -83,7 +83,7 @@ describe('TableConfig Interface', () => {
       // TypeScript will enforce this at compile time
       const config: TableConfig = {
         tableId: 'required-id',
-        columns: []
+        columns: [],
       };
 
       expect(config.tableId).toBeDefined();
@@ -95,7 +95,7 @@ describe('TableConfig Interface', () => {
       // TypeScript will enforce this at compile time
       const config: TableConfig = {
         tableId: 'test',
-        columns: []
+        columns: [],
       };
 
       expect(config.columns).toBeDefined();
@@ -107,7 +107,7 @@ describe('TableConfig Interface', () => {
     it('should handle undefined optional properties gracefully', () => {
       const config: TableConfig = {
         tableId: 'minimal-table',
-        columns: []
+        columns: [],
       };
 
       // All optional properties should be undefined when not set
@@ -127,28 +127,28 @@ describe('TableConfig Interface', () => {
   describe('StickyColumns Type', () => {
     it('should allow empty sticky columns object', () => {
       const stickyColumns: StickyColumns = {};
-      
+
       expect(stickyColumns.left).toBeUndefined();
       expect(stickyColumns.right).toBeUndefined();
     });
 
     it('should allow left sticky columns only', () => {
       const stickyColumns: StickyColumns = { left: 2 };
-      
+
       expect(stickyColumns.left).toBe(2);
       expect(stickyColumns.right).toBeUndefined();
     });
 
     it('should allow right sticky columns only', () => {
       const stickyColumns: StickyColumns = { right: 1 };
-      
+
       expect(stickyColumns.left).toBeUndefined();
       expect(stickyColumns.right).toBe(1);
     });
 
     it('should allow both left and right sticky columns', () => {
       const stickyColumns: StickyColumns = { left: 1, right: 2 };
-      
+
       expect(stickyColumns.left).toBe(1);
       expect(stickyColumns.right).toBe(2);
     });
@@ -178,4 +178,4 @@ describe('TableConfig Interface', () => {
       expect(isValidStickyColumns({ right: -1 })).toBe(false);
     });
   });
-}); 
+});

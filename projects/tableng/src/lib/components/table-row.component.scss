@@ -1,7 +1,9 @@
 .tableng-row {
   background-color: white;
   border-bottom: 1px solid #e0e0e0;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: pointer;
 }
 
@@ -72,4 +74,4 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-} 
+}

@@ -1,112 +1,133 @@
-<div class="tableng-cell"
-     [class.tableng-cell-editable]="editable && !editConfig?.readonly && !editConfig?.disabled"
-     [class.tableng-cell-editing]="isEditing"
-     [class.tableng-cell-error]="cellControl.invalid && cellControl.touched"
-     role="gridcell"
-     tabindex="0"
-     (dblclick)="onDoubleClick()"
-     (keydown)="onKeyDown($event)"
-     (mouseenter)="onMouseEnter()"
-     (mouseleave)="onMouseLeave()">
-  
+<div
+  class="tableng-cell"
+  [class.tableng-cell-editable]="
+    editable && !editConfig?.readonly && !editConfig?.disabled
+  "
+  [class.tableng-cell-editing]="isEditing"
+  [class.tableng-cell-error]="cellControl.invalid && cellControl.touched"
+  role="gridcell"
+  tabindex="0"
+  (dblclick)="onDoubleClick()"
+  (keydown)="onKeyDown($event)"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+>
   <!-- Display Mode -->
   <div *ngIf="!isEditing" class="tableng-cell-display">
-    <div class="tableng-cell-content"
-         [class.tableng-cell-text]="column?.type === 'text'"
-         [class.tableng-cell-number]="column?.type === 'number'"
-         [class.tableng-cell-date]="column?.type === 'date'"
-         [class.tableng-cell-boolean]="column?.type === 'boolean'">
-      
+    <div
+      class="tableng-cell-content"
+      [class.tableng-cell-text]="column?.type === 'text'"
+      [class.tableng-cell-number]="column?.type === 'number'"
+      [class.tableng-cell-date]="column?.type === 'date'"
+      [class.tableng-cell-boolean]="column?.type === 'boolean'"
+    >
       <!-- Tree Grid Controls -->
       <div *ngIf="isFirstColumn" class="tableng-tree-controls">
         <span class="tableng-tree-indent" [style.width.px]="level * 20"></span>
-        <button *ngIf="hasChildren" 
-                class="tableng-tree-toggle"
-                [class.tableng-tree-toggle-expanded]="isExpanded"
-                (click)="onToggleExpand($event)"
-                aria-label="Toggle row expansion">
+        <button
+          *ngIf="hasChildren"
+          class="tableng-tree-toggle"
+          [class.tableng-tree-toggle-expanded]="isExpanded"
+          (click)="onToggleExpand($event)"
+          aria-label="Toggle row expansion"
+        >
           <span class="tableng-tree-toggle-icon">▶</span>
         </button>
       </div>
 
       {{ getFormattedValue() }}
     </div>
-    
+
     <!-- Edit Indicator -->
-    <div *ngIf="showEditIndicator" class="tableng-edit-indicator" aria-hidden="true">
+    <div
+      *ngIf="showEditIndicator"
+      class="tableng-edit-indicator"
+      aria-hidden="true"
+    >
       ✏️
     </div>
   </div>
-  
+
   <!-- Edit Mode -->
   <div *ngIf="isEditing" class="tableng-cell-edit">
-    
     <!-- Text Input -->
-    <input *ngIf="getEditType() === 'text'"
-           #editInput
-           type="text"
-           class="tableng-input"
-           [formControl]="cellControl"
-           [attr.aria-label]="'Edit ' + column?.title"
-           (keydown)="onEditKeyDown($event)"
-           (blur)="onBlur()" />
-    
+    <input
+      *ngIf="getEditType() === 'text'"
+      #editInput
+      type="text"
+      class="tableng-input"
+      [formControl]="cellControl"
+      [attr.aria-label]="'Edit ' + column?.title"
+      (keydown)="onEditKeyDown($event)"
+      (blur)="onBlur()"
+    />
+
     <!-- Number Input -->
-    <input *ngIf="getEditType() === 'number'"
-           #editInput
-           type="number"
-           class="tableng-input"
-           [formControl]="cellControl"
-           [attr.aria-label]="'Edit ' + column?.title"
-           (keydown)="onEditKeyDown($event)"
-           (blur)="onBlur()" />
-    
+    <input
+      *ngIf="getEditType() === 'number'"
+      #editInput
+      type="number"
+      class="tableng-input"
+      [formControl]="cellControl"
+      [attr.aria-label]="'Edit ' + column?.title"
+      (keydown)="onEditKeyDown($event)"
+      (blur)="onBlur()"
+    />
+
     <!-- Date Input -->
-    <input *ngIf="getEditType() === 'date'"
-           #editInput
-           type="date"
-           class="tableng-input"
-           [formControl]="cellControl"
-           [attr.aria-label]="'Edit ' + column?.title"
-           (keydown)="onEditKeyDown($event)"
-           (blur)="onBlur()" />
-    
+    <input
+      *ngIf="getEditType() === 'date'"
+      #editInput
+      type="date"
+      class="tableng-input"
+      [formControl]="cellControl"
+      [attr.aria-label]="'Edit ' + column?.title"
+      (keydown)="onEditKeyDown($event)"
+      (blur)="onBlur()"
+    />
+
     <!-- Select Dropdown -->
-    <select *ngIf="getEditType() === 'select'"
-            #editInput
-            class="tableng-select"
-            [formControl]="cellControl"
-            [attr.aria-label]="'Edit ' + column?.title"
-            (keydown)="onEditKeyDown($event)"
-            (blur)="onBlur()">
+    <select
+      *ngIf="getEditType() === 'select'"
+      #editInput
+      class="tableng-select"
+      [formControl]="cellControl"
+      [attr.aria-label]="'Edit ' + column?.title"
+      (keydown)="onEditKeyDown($event)"
+      (blur)="onBlur()"
+    >
       <option *ngFor="let option of getSelectOptions()" [value]="option.value">
         {{ option.label }}
       </option>
     </select>
-    
+
     <!-- Checkbox -->
-    <input *ngIf="getEditType() === 'checkbox'"
-           #editInput
-           type="checkbox"
-           class="tableng-checkbox"
-           [formControl]="cellControl"
-           [attr.aria-label]="'Edit ' + column?.title"
-           (keydown)="onEditKeyDown($event)"
-           (blur)="onBlur()" />
-    
+    <input
+      *ngIf="getEditType() === 'checkbox'"
+      #editInput
+      type="checkbox"
+      class="tableng-checkbox"
+      [formControl]="cellControl"
+      [attr.aria-label]="'Edit ' + column?.title"
+      (keydown)="onEditKeyDown($event)"
+      (blur)="onBlur()"
+    />
+
     <!-- Custom Editor -->
     <div *ngIf="getEditType() === 'custom'" class="tableng-custom-editor">
       <div class="tableng-custom-content">
         <ng-content></ng-content>
       </div>
     </div>
-    
+
     <!-- Validation Error -->
-    <div *ngIf="cellControl.invalid && cellControl.touched"
-         class="tableng-validation-error"
-         role="alert"
-         aria-live="polite">
+    <div
+      *ngIf="cellControl.invalid && cellControl.touched"
+      class="tableng-validation-error"
+      role="alert"
+      aria-live="polite"
+    >
       {{ validationError }}
     </div>
   </div>
-</div> 
+</div>

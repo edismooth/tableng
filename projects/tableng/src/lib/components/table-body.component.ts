@@ -42,7 +42,7 @@ export interface CellChangeEvent {
 @Component({
   selector: 'tng-table-body',
   templateUrl: './table-body.component.html',
-  styleUrls: ['./table-body.component.scss']
+  styleUrls: ['./table-body.component.scss'],
 })
 export class TableBodyComponent {
   @Input() columns: ColumnDefinition[] = [];
@@ -55,7 +55,11 @@ export class TableBodyComponent {
   @Input() virtualScrollConfig?: VirtualScrollConfig;
 
   @Output() rowClick = new EventEmitter<unknown>();
-  @Output() rowSelect = new EventEmitter<{ row: unknown; selected: boolean; index: number }>();
+  @Output() rowSelect = new EventEmitter<{
+    row: unknown;
+    selected: boolean;
+    index: number;
+  }>();
   @Output() cellEdit = new EventEmitter<CellEditEvent>();
   @Output() cellChange = new EventEmitter<CellChangeEvent>();
   @Output() toggleRowExpansion = new EventEmitter<TableRow<any>>();
@@ -76,22 +80,30 @@ export class TableBodyComponent {
     }
   }
 
-  onRowSelect(eventData: { rowIndex: number; rowData: TableRow<any>; selected: boolean }, _rowData: TableRow<any>, _index: number): void {
+  onRowSelect(
+    eventData: { rowIndex: number; rowData: TableRow<any>; selected: boolean },
+    _rowData: TableRow<any>,
+    _index: number
+  ): void {
     this.rowSelect.emit({
       row: eventData.rowData,
       selected: eventData.selected,
-      index: eventData.rowIndex
+      index: eventData.rowIndex,
     });
   }
 
-  onRowSelectVirtual(event: Event, rowData: TableRow<any>, index: number): void {
+  onRowSelectVirtual(
+    event: Event,
+    rowData: TableRow<any>,
+    index: number
+  ): void {
     const target = event.target as HTMLInputElement;
     const selected = target.checked;
 
     this.rowSelect.emit({
       row: rowData,
       selected: selected,
-      index: index
+      index: index,
     });
   }
 
@@ -107,18 +119,27 @@ export class TableBodyComponent {
     target.classList.remove('tableng-row-hover');
   }
 
-  onCellClick(event: Event, _column: ColumnDefinition, _rowData: unknown, _rowIndex: number): void {
+  onCellClick(
+    event: Event,
+    _column: ColumnDefinition,
+    _rowData: unknown,
+    _rowIndex: number
+  ): void {
     // Basic cell click handling
     event.stopPropagation();
   }
 
-  onCellDoubleClick(column: ColumnDefinition, rowData: unknown, rowIndex: number): void {
+  onCellDoubleClick(
+    column: ColumnDefinition,
+    rowData: unknown,
+    rowIndex: number
+  ): void {
     if (column.editable && this.config?.editable) {
       this.cellEdit.emit({
         rowIndex: rowIndex,
         column: column.key,
         value: this.getCellValue(rowData, column),
-        rowData: rowData
+        rowData: rowData,
       });
     }
   }
@@ -144,14 +165,14 @@ export class TableBodyComponent {
     this.virtualScrollConfig = {
       ...this.virtualScrollConfig,
       startIndex: startIndex,
-      endIndex: endIndex
+      endIndex: endIndex,
     };
   }
 
   // Helper Methods
   getBodyClasses(): string[] {
     const classes = ['tableng-body'];
-    
+
     if (this.config?.virtualScrolling) {
       classes.push('tableng-virtual-scrolling');
     }
@@ -161,7 +182,7 @@ export class TableBodyComponent {
 
   getRowClasses(rowData: unknown, _index: number): string[] {
     const classes = ['tableng-row'];
-    
+
     if (this.isRowSelected(rowData)) {
       classes.push('tableng-row-selected');
     }
@@ -171,10 +192,10 @@ export class TableBodyComponent {
 
   getCellClasses(column: ColumnDefinition, _rowData: unknown): string[] {
     const classes = ['tableng-cell'];
-    
+
     // Add type-specific classes
     classes.push(`tableng-cell-type-${column.type}`);
-    
+
     if (column.cssClass) {
       classes.push(column.cssClass);
     }
@@ -194,7 +215,9 @@ export class TableBodyComponent {
     if (this.selectedRows instanceof Set) {
       return this.selectedRows.has(rowData);
     }
-    return Array.isArray(this.selectedRows) && this.selectedRows.includes(rowData);
+    return (
+      Array.isArray(this.selectedRows) && this.selectedRows.includes(rowData)
+    );
   }
 
   getCellValue(rowData: unknown, column: ColumnDefinition): unknown {
@@ -223,19 +246,21 @@ export class TableBodyComponent {
     switch (column.type) {
       case 'boolean':
         return value ? 'Yes' : 'No';
-      
+
       case 'date':
         if (value instanceof Date) {
           return value.toLocaleDateString();
         } else if (typeof value === 'string') {
           const date = new Date(value);
-          return isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
+          return isNaN(date.getTime())
+            ? String(value)
+            : date.toLocaleDateString();
         }
         return String(value);
-      
+
       case 'number':
         return typeof value === 'number' ? value.toString() : String(value);
-      
+
       default:
         return String(value);
     }
@@ -249,7 +274,7 @@ export class TableBodyComponent {
       return data.id ?? data._id ?? index;
     }
     return index;
-  }
+  };
 
   // Virtual Scrolling Methods
   getVisibleData(): TableRow<any>[] {
@@ -258,8 +283,11 @@ export class TableBodyComponent {
     }
 
     const start = this.virtualScrollConfig.startIndex;
-    const end = Math.min(this.virtualScrollConfig.endIndex + 1, this.data.length);
-    
+    const end = Math.min(
+      this.virtualScrollConfig.endIndex + 1,
+      this.data.length
+    );
+
     return this.data.slice(start, end);
   }
 
@@ -284,7 +312,9 @@ export class TableBodyComponent {
       return 0;
     }
 
-    return this.virtualScrollConfig.startIndex * this.virtualScrollConfig.itemHeight;
+    return (
+      this.virtualScrollConfig.startIndex * this.virtualScrollConfig.itemHeight
+    );
   }
 
   getBottomSpacerHeight(): number {
@@ -292,7 +322,8 @@ export class TableBodyComponent {
       return 0;
     }
 
-    const remainingItems = this.data.length - (this.virtualScrollConfig.endIndex + 1);
+    const remainingItems =
+      this.data.length - (this.virtualScrollConfig.endIndex + 1);
     return Math.max(0, remainingItems * this.virtualScrollConfig.itemHeight);
   }
-} 
+}

@@ -19,7 +19,7 @@ export interface TableRow<T> {
 
   /** A reference to the parent row, if it exists. */
   parent?: TableRow<T>;
-  
+
   /** Internal flag to control visibility */
   isVisible?: boolean;
-} 
+}

@@ -10,33 +10,40 @@ describe('LocalStorageService', () => {
     tableId: 'test-table',
     columns: [
       { key: 'id', title: 'ID', type: 'text' },
-      { key: 'name', title: 'Name', type: 'text' }
+      { key: 'name', title: 'Name', type: 'text' },
     ],
     virtualScrolling: true,
-    stickyHeaders: true
+    stickyHeaders: true,
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [LocalStorageService]
+      providers: [LocalStorageService],
     });
     service = TestBed.inject(LocalStorageService);
 
     // Mock localStorage
     mockLocalStorage = {};
-    
+
     // Override localStorage methods
     Storage.prototype.getItem = (key: string) => mockLocalStorage[key] || null;
-    Storage.prototype.setItem = (key: string, value: string) => { mockLocalStorage[key] = value; };
-    Storage.prototype.removeItem = (key: string) => { delete mockLocalStorage[key]; };
-    Storage.prototype.clear = () => { mockLocalStorage = {}; };
-    
+    Storage.prototype.setItem = (key: string, value: string) => {
+      mockLocalStorage[key] = value;
+    };
+    Storage.prototype.removeItem = (key: string) => {
+      delete mockLocalStorage[key];
+    };
+    Storage.prototype.clear = () => {
+      mockLocalStorage = {};
+    };
+
     // Mock length and key methods
     Object.defineProperty(Storage.prototype, 'length', {
       get: () => Object.keys(mockLocalStorage).length,
-      configurable: true
+      configurable: true,
     });
-    Storage.prototype.key = (index: number) => Object.keys(mockLocalStorage)[index] || null;
+    Storage.prototype.key = (index: number) =>
+      Object.keys(mockLocalStorage)[index] || null;
   });
 
   it('should be created', () => {
@@ -51,19 +58,21 @@ describe('LocalStorageService', () => {
         columnWidths: { id: 100, name: 200 },
         sortState: { column: 'id', direction: 'asc' as const },
         filterState: { name: 'test' },
-        scrollPosition: { x: 0, y: 100 }
+        scrollPosition: { x: 0, y: 100 },
       };
 
       service.saveTableState('test-table', tableState);
 
-      expect(mockLocalStorage['tableng_test-table']).toBe(JSON.stringify(tableState));
+      expect(mockLocalStorage['tableng_test-table']).toBe(
+        JSON.stringify(tableState)
+      );
     });
 
     it('should handle save errors gracefully', () => {
       Storage.prototype.setItem = () => {
         throw new Error('Storage full');
       };
-      
+
       expect(() => {
         service.saveTableState('test-table', { config: mockTableConfig });
       }).not.toThrow();
@@ -75,7 +84,7 @@ describe('LocalStorageService', () => {
       const tableState = {
         config: mockTableConfig,
         columnOrder: ['id', 'name'],
-        columnWidths: { id: 100, name: 200 }
+        columnWidths: { id: 100, name: 200 },
       };
       mockLocalStorage['tableng_test-table'] = JSON.stringify(tableState);
 
@@ -101,7 +110,9 @@ describe('LocalStorageService', () => {
 
   describe('removeTableState', () => {
     it('should remove table state from localStorage', () => {
-      mockLocalStorage['tableng_test-table'] = JSON.stringify({ config: mockTableConfig });
+      mockLocalStorage['tableng_test-table'] = JSON.stringify({
+        config: mockTableConfig,
+      });
 
       service.removeTableState('test-table');
 
@@ -151,7 +162,9 @@ describe('LocalStorageService', () => {
 
   describe('hasTableState', () => {
     it('should return true when table state exists', () => {
-      mockLocalStorage['tableng_test-table'] = JSON.stringify({ config: mockTableConfig });
+      mockLocalStorage['tableng_test-table'] = JSON.stringify({
+        config: mockTableConfig,
+      });
 
       const result = service.hasTableState('test-table');
 
@@ -183,7 +196,7 @@ describe('LocalStorageService', () => {
     it('should export all table states as JSON', () => {
       const state1 = { config: mockTableConfig };
       const state2 = { config: { ...mockTableConfig, tableId: 'table2' } };
-      
+
       mockLocalStorage['tableng_table1'] = JSON.stringify(state1);
       mockLocalStorage['tableng_table2'] = JSON.stringify(state2);
 
@@ -193,7 +206,7 @@ describe('LocalStorageService', () => {
 
       expect(result).toEqual({
         table1: state1,
-        table2: state2
+        table2: state2,
       });
     });
   });
@@ -202,13 +215,17 @@ describe('LocalStorageService', () => {
     it('should import table states from JSON object', () => {
       const states = {
         table1: { config: mockTableConfig },
-        table2: { config: { ...mockTableConfig, tableId: 'table2' } }
+        table2: { config: { ...mockTableConfig, tableId: 'table2' } },
       };
 
       service.importTableStates(states);
 
-      expect(mockLocalStorage['tableng_table1']).toBe(JSON.stringify(states.table1));
-      expect(mockLocalStorage['tableng_table2']).toBe(JSON.stringify(states.table2));
+      expect(mockLocalStorage['tableng_table1']).toBe(
+        JSON.stringify(states.table1)
+      );
+      expect(mockLocalStorage['tableng_table2']).toBe(
+        JSON.stringify(states.table2)
+      );
     });
 
     it('should handle import errors gracefully', () => {
@@ -221,4 +238,4 @@ describe('LocalStorageService', () => {
       }).not.toThrow();
     });
   });
-}); 
+});
