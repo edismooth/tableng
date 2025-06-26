@@ -227,19 +227,27 @@ describe('TableCellComponent', () => {
     });
 
     it('should focus input element after entering edit mode', fakeAsync(() => {
+      component.editConfig = { type: 'text' };
+      component.column = { ...mockColumn, type: 'text' };
+      fixture.detectChanges();
+      
       component.startEdit();
       fixture.detectChanges();
       tick();
 
       const inputElement = fixture.debugElement.query(By.css('input'));
-      expect(document.activeElement).toBe(inputElement.nativeElement);
+      expect(inputElement).toBeTruthy(); // First ensure input exists
+      if (inputElement) {
+        expect(document.activeElement).toBe(inputElement.nativeElement);
+      }
     }));
   });
 
   describe('Edit Mode - Text Input', () => {
     beforeEach(() => {
-      fixture.detectChanges();
       component.editConfig = { type: 'text' };
+      component.column = { ...mockColumn, type: 'text' }; // Ensure column type is text
+      fixture.detectChanges();
       component.startEdit();
       fixture.detectChanges();
     });
@@ -270,8 +278,11 @@ describe('TableCellComponent', () => {
 
   describe('Inline Editing & Validation', () => {
     beforeEach(() => {
+      component.editConfig = { type: 'text' };
+      component.column = { ...mockColumn, type: 'text' }; // Ensure column type is text
       fixture.detectChanges(); // This will trigger ngOnInit
       component.startEdit();
+      fixture.detectChanges();
     });
 
     it('should show validation error for required field', fakeAsync(() => {
