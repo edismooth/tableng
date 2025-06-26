@@ -113,7 +113,7 @@ jobs:
     needs: [build]
     strategy:
       matrix:
-        angular-version: ['20']
+        angular-version: ['19', '20']
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -202,7 +202,14 @@ jobs:
       - name: Check bundle size
         run: |
           cd dist/tableng
-          SIZE=$(wc -c < bundles/tableng.umd.min.js)
+          # Check for the actual ES module bundle
+          BUNDLE_FILE="fesm2022/edi_smooth-tableng.mjs"
+          if [ ! -f "$BUNDLE_FILE" ]; then
+            echo "Bundle file not found: $BUNDLE_FILE"
+            ls -la fesm2022/
+            exit 1
+          fi
+          SIZE=$(wc -c <"$BUNDLE_FILE")
           echo "Bundle size: $SIZE bytes"
           if [ $SIZE -gt 1048576 ]; then # 1MB limit
             echo "Bundle size exceeds 1MB limit"
