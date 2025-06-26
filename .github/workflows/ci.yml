@@ -133,9 +133,10 @@ jobs:
       - name: Test Angular ${{ matrix.angular-version }} compatibility
         run: |
           npm install -g @angular/cli@${{ matrix.angular-version }}
+          cd /tmp
           ng new test-app --routing --style=css --skip-git --package-manager=npm
           cd test-app
-          npm install ../dist/tableng
+          npm install ${{ github.workspace }}/dist/tableng
           ng build --configuration production
 
   security:
