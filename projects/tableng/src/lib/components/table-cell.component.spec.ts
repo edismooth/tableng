@@ -6,6 +6,7 @@ import {
 } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { TableCellComponent } from './table-cell.component';
 import { ColumnDefinition } from '../interfaces/column-definition.interface';
 import { CellEditConfig } from '../interfaces/cell-edit-config.interface';
@@ -33,7 +34,7 @@ describe('TableCellComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [TableCellComponent],
-      imports: [FormsModule, ReactiveFormsModule],
+      imports: [CommonModule, FormsModule, ReactiveFormsModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TableCellComponent);
@@ -104,6 +105,7 @@ describe('TableCellComponent', () => {
 
     it('should not apply editable styling when editable is false', () => {
       component.editable = false;
+      component.editConfig = { ...mockEditConfig, readonly: false, disabled: false }; // Ensure not readonly/disabled
       fixture.detectChanges();
 
       const cellElement = fixture.debugElement.query(By.css('.tableng-cell'));
@@ -127,6 +129,7 @@ describe('TableCellComponent', () => {
       // Test boolean formatting
       component.column = { ...mockColumn, type: 'boolean' };
       component.value = true;
+      component.ngOnInit(); // Re-trigger initialization to update formatting
       fixture.detectChanges();
 
       let content = fixture.debugElement.query(By.css('.tableng-cell-content'));
@@ -135,6 +138,7 @@ describe('TableCellComponent', () => {
       // Test number formatting
       component.column = { ...mockColumn, type: 'number' };
       component.value = 1234.56;
+      component.ngOnInit(); // Re-trigger initialization
       fixture.detectChanges();
 
       content = fixture.debugElement.query(By.css('.tableng-cell-content'));
@@ -143,6 +147,7 @@ describe('TableCellComponent', () => {
       // Test date formatting
       component.column = { ...mockColumn, type: 'date' };
       component.value = new Date('2023-01-01');
+      component.ngOnInit(); // Re-trigger initialization
       fixture.detectChanges();
 
       content = fixture.debugElement.query(By.css('.tableng-cell-content'));
@@ -156,6 +161,7 @@ describe('TableCellComponent', () => {
           typeof value === 'string' ? value.toUpperCase() : String(value),
       };
       component.value = 'test value';
+      component.ngOnInit(); // Re-trigger initialization with new formatter
       fixture.detectChanges();
 
       const content = fixture.debugElement.query(
@@ -261,11 +267,13 @@ describe('TableCellComponent', () => {
 
     it('should show current value in text input', () => {
       const inputElement = fixture.debugElement.query(By.css('input'));
+      expect(inputElement).toBeTruthy();
       expect(inputElement.nativeElement.value).toBe('Test Value');
     });
 
     it('should update cellControl when input changes', () => {
       const inputElement = fixture.debugElement.query(By.css('input'));
+      expect(inputElement).toBeTruthy();
 
       inputElement.nativeElement.value = 'New Value';
       inputElement.triggerEventHandler('input', {
@@ -376,9 +384,9 @@ describe('TableCellComponent', () => {
       (component as any).setupFormControl();
       fixture.detectChanges();
 
-      const inputElement = fixture.debugElement.query(
-        By.css('input')
-      ).nativeElement;
+      const inputQuery = fixture.debugElement.query(By.css('input'));
+      expect(inputQuery).toBeTruthy();
+      const inputElement = inputQuery.nativeElement;
       component.cellControl.setValue('');
       component.cellControl.markAsTouched();
       tick();
