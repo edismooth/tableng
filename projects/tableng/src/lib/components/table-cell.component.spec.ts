@@ -106,6 +106,7 @@ describe('TableCellComponent', () => {
     it('should not apply editable styling when editable is false', () => {
       component.editable = false;
       component.editConfig = { ...mockEditConfig, readonly: false, disabled: false }; // Ensure not readonly/disabled
+      component.ngOnInit(); // Re-trigger initialization
       fixture.detectChanges();
 
       const cellElement = fixture.debugElement.query(By.css('.tableng-cell'));
@@ -300,6 +301,7 @@ describe('TableCellComponent', () => {
 
       component.cellControl.setValue('');
       component.cellControl.markAsTouched();
+      component.cellControl.updateValueAndValidity();
       tick();
       fixture.detectChanges();
 
@@ -319,6 +321,7 @@ describe('TableCellComponent', () => {
 
       component.cellControl.setValue('123');
       component.cellControl.markAsTouched();
+      component.cellControl.updateValueAndValidity();
       tick();
       fixture.detectChanges();
 
@@ -338,6 +341,7 @@ describe('TableCellComponent', () => {
 
       component.cellControl.setValue('123');
       component.cellControl.markAsTouched();
+      component.cellControl.updateValueAndValidity();
       tick();
       fixture.detectChanges();
 
@@ -367,6 +371,7 @@ describe('TableCellComponent', () => {
 
       component.cellControl.setValue('invalid');
       component.cellControl.markAsTouched();
+      component.cellControl.updateValueAndValidity();
       tick();
       fixture.detectChanges();
 
@@ -389,6 +394,7 @@ describe('TableCellComponent', () => {
       const inputElement = inputQuery.nativeElement;
       component.cellControl.setValue('');
       component.cellControl.markAsTouched();
+      component.cellControl.updateValueAndValidity();
       tick();
       fixture.detectChanges();
 
