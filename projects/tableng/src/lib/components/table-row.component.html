@@ -36,7 +36,7 @@
       [editable]="editable && (column.editable ?? false)"
       [isFirstColumn]="first"
       [level]="rowData?.level || 0"
-      [hasChildren]="!!(rowData?.children && rowData.children.length > 0)"
+      [hasChildren]="(rowData?.children?.length ?? 0) > 0"
       [isExpanded]="rowData?.expanded || false"
       (editStart)="onCellEditStart($event)"
       (editEnd)="onCellEditEnd($event)"

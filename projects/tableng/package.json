@@ -1,6 +1,29 @@
 {
   "name": "tableng",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "description": "A modern, feature-rich Angular table library designed for performance and developer experience",
+  "keywords": [
+    "angular",
+    "table",
+    "datagrid",
+    "component",
+    "typescript",
+    "ui",
+    "data-table",
+    "sorting",
+    "filtering",
+    "pagination"
+  ],
+  "author": "Oskar Gembalski",
+  "license": "MIT",
+  "homepage": "https://github.com/oskargembalski/tableng",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oskargembalski/tableng.git"
+  },
+  "bugs": {
+    "url": "https://github.com/oskargembalski/tableng/issues"
+  },
   "peerDependencies": {
     "@angular/common": "^16.2.0",
     "@angular/core": "^16.2.0"

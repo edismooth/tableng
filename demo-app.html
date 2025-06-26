@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TableNG Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .demo-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .demo-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .note {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #2196f3;
+            margin: 20px 0;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .step {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 TableNG Library Demo</h1>
+            <p>A powerful, customizable Angular table component with advanced features</p>
+        </div>
+
+        <div class="note">
+            <strong>📝 Note:</strong> This is a static demo page. To run the actual Angular component, follow the setup instructions below.
+        </div>
+
+        <div class="demo-section">
+            <h3>🏗️ Quick Setup Guide</h3>
+            <p>To run a live demo of the TableNG library, follow these steps:</p>
+            
+            <div class="step">
+                <strong>Step 1:</strong> Build the library (already done)
+                <div class="code-block">npm run build</div>
+            </div>
+
+            <div class="step">
+                <strong>Step 2:</strong> Create a new Angular application
+                <div class="code-block">ng new tableng-demo --routing --style=css</div>
+            </div>
+
+            <div class="step">
+                <strong>Step 3:</strong> Install the built library
+                <div class="code-block">
+                    cd tableng-demo<br>
+                    npm install ../dist/tableng
+                </div>
+            </div>
+
+            <div class="step">
+                <strong>Step 4:</strong> Import and use the TableNG module
+                <div class="code-block">
+                    // app.component.ts<br>
+                    import { Component } from '@angular/core';<br>
+                    import { TablengModule, TableConfig } from 'tableng';<br><br>
+                    @Component({<br>
+                    &nbsp;&nbsp;selector: 'app-root',<br>
+                    &nbsp;&nbsp;imports: [TablengModule],<br>
+                    &nbsp;&nbsp;template: `<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;tng-table <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[config]="tableConfig"<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[data]="tableData"&gt;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;/tng-table&gt;<br>
+                    &nbsp;&nbsp;`<br>
+                    })<br>
+                    export class AppComponent { ... }
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>📊 Sample Configuration</h3>
+            <p>Here's a complete example of how to configure the table:</p>
+            <div class="code-block">
+export class AppComponent {
+  tableConfig: TableConfig = {
+    tableId: 'demo-table',
+    columns: [
+      { 
+        key: 'id', 
+        title: 'ID', 
+        type: 'text', 
+        sortable: true,
+        width: 80
+      },
+      { 
+        key: 'name', 
+        title: 'Name', 
+        type: 'text', 
+        sortable: true,
+        filterable: true,
+        resizable: true
+      },
+      { 
+        key: 'email', 
+        title: 'Email', 
+        type: 'text', 
+        filterable: true
+      },
+      { 
+        key: 'age', 
+        title: 'Age', 
+        type: 'number', 
+        sortable: true,
+        editable: true
+      },
+      { 
+        key: 'active', 
+        title: 'Active', 
+        type: 'boolean' 
+      }
+    ],
+    virtualScrolling: true,
+    stickyHeaders: true,
+    sorting: true,
+    filtering: true,
+    resizable: true,
+    reorderable: true,
+    editable: true
+  };
+
+  tableData = [
+    { id: 1, name: 'John Doe', email: 'john@example.com', age: 30, active: true },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', age: 25, active: false },
+    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', age: 35, active: true },
+    // Add more data as needed...
+  ];
+}
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>🎯 Key Features</h3>
+            <ul>
+                <li><strong>Virtual Scrolling:</strong> Handle large datasets (10k+ rows) efficiently</li>
+                <li><strong>Sorting & Filtering:</strong> Built-in sorting and filtering capabilities</li>
+                <li><strong>Column Resizing:</strong> Drag column borders to resize</li>
+                <li><strong>Column Reordering:</strong> Drag and drop columns to reorder</li>
+                <li><strong>Inline Editing:</strong> Edit cells directly in the table</li>
+                <li><strong>Row Selection:</strong> Single or multiple row selection</li>
+                <li><strong>Sticky Headers:</strong> Headers stay visible while scrolling</li>
+                <li><strong>Theming:</strong> Customizable themes and styling</li>
+                <li><strong>State Persistence:</strong> Save and restore table state</li>
+                <li><strong>Accessibility:</strong> Full keyboard navigation and screen reader support</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h3>🧪 Test the Library</h3>
+            <p>The library includes comprehensive tests (250+ passing tests). Run them with:</p>
+            <div class="code-block">npm test</div>
+            
+            <p>For test coverage:</p>
+            <div class="code-block">npm run test:coverage</div>
+        </div>
+
+        <div class="demo-section">
+            <h3>⚡ Alternative: Run Development Server</h3>
+            <p>If you want to see the library in action immediately, you can create a quick demo component within this workspace:</p>
+            
+            <div class="step">
+                <strong>Option A:</strong> Generate demo app in workspace
+                <div class="code-block">ng generate app demo-standalone</div>
+            </div>
+
+            <div class="step">
+                <strong>Option B:</strong> Use the existing test files as examples
+                <div class="code-block">
+                    # View the test files to see usage examples<br>
+                    cat projects/tableng/src/lib/components/table.component.spec.ts
+                </div>
+            </div>
+        </div>
+
+        <div class="note">
+            <strong>🎉 Quick Start:</strong> The fastest way to verify the library works is to run the comprehensive test suite with <code>npm test</code>. All 250+ tests demonstrate the library's functionality!
+        </div>
+    </div>
+</body>
+</html>
