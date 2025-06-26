@@ -107,16 +107,22 @@ describe('TableCellComponent', () => {
       // Create fresh component instance to avoid state pollution
       const freshFixture = TestBed.createComponent(TableCellComponent);
       const freshComponent = freshFixture.componentInstance;
-      
+
       freshComponent.column = mockColumn;
       freshComponent.value = 'Test Value';
       freshComponent.rowIndex = 0;
-      freshComponent.editConfig = { ...mockEditConfig, readonly: false, disabled: false };
+      freshComponent.editConfig = {
+        ...mockEditConfig,
+        readonly: false,
+        disabled: false,
+      };
       freshComponent.editable = false; // Set to false
-      
+
       freshFixture.detectChanges();
 
-      const cellElement = freshFixture.debugElement.query(By.css('.tableng-cell'));
+      const cellElement = freshFixture.debugElement.query(
+        By.css('.tableng-cell')
+      );
       expect(cellElement.nativeElement.classList).not.toContain(
         'tableng-cell-editable'
       );
@@ -143,7 +149,9 @@ describe('TableCellComponent', () => {
       boolComponent.editable = false;
       boolFixture.detectChanges();
 
-      let content = boolFixture.debugElement.query(By.css('.tableng-cell-content'));
+      let content = boolFixture.debugElement.query(
+        By.css('.tableng-cell-content')
+      );
       expect(content.nativeElement.textContent.trim()).toBe('Yes');
 
       // Test number formatting - create fresh component
@@ -175,7 +183,7 @@ describe('TableCellComponent', () => {
       // Create fresh component for custom formatter test
       const customFixture = TestBed.createComponent(TableCellComponent);
       const customComponent = customFixture.componentInstance;
-      
+
       customComponent.column = {
         ...mockColumn,
         formatter: (value: unknown) =>
@@ -258,7 +266,7 @@ describe('TableCellComponent', () => {
       component.editConfig = { type: 'text' };
       component.column = { ...mockColumn, type: 'text' };
       fixture.detectChanges();
-      
+
       component.startEdit();
       fixture.detectChanges();
       tick();
@@ -319,17 +327,21 @@ describe('TableCellComponent', () => {
       // Create a fresh component with required validation
       const validationFixture = TestBed.createComponent(TableCellComponent);
       const validationComponent = validationFixture.componentInstance;
-      
+
       validationComponent.column = { ...mockColumn, type: 'text' };
       validationComponent.value = 'Test Value';
       validationComponent.rowIndex = 0;
-      validationComponent.editConfig = { ...mockEditConfig, required: true, type: 'text' };
+      validationComponent.editConfig = {
+        ...mockEditConfig,
+        required: true,
+        type: 'text',
+      };
       validationComponent.editable = true;
-      
+
       validationFixture.detectChanges();
       validationComponent.startEdit();
       validationFixture.detectChanges();
-      
+
       // Set invalid value and mark as touched
       validationComponent.cellControl.setValue('');
       validationComponent.cellControl.markAsTouched();
@@ -350,17 +362,21 @@ describe('TableCellComponent', () => {
       // Create a fresh component with minLength validation
       const minLengthFixture = TestBed.createComponent(TableCellComponent);
       const minLengthComponent = minLengthFixture.componentInstance;
-      
+
       minLengthComponent.column = { ...mockColumn, type: 'text' };
       minLengthComponent.value = 'Test Value';
       minLengthComponent.rowIndex = 0;
-      minLengthComponent.editConfig = { ...mockEditConfig, minLength: 5, type: 'text' };
+      minLengthComponent.editConfig = {
+        ...mockEditConfig,
+        minLength: 5,
+        type: 'text',
+      };
       minLengthComponent.editable = true;
-      
+
       minLengthFixture.detectChanges();
       minLengthComponent.startEdit();
       minLengthFixture.detectChanges();
-      
+
       // Set short value and mark as touched
       minLengthComponent.cellControl.setValue('123');
       minLengthComponent.cellControl.markAsTouched();
@@ -381,17 +397,21 @@ describe('TableCellComponent', () => {
       // Create a fresh component with pattern validation
       const patternFixture = TestBed.createComponent(TableCellComponent);
       const patternComponent = patternFixture.componentInstance;
-      
+
       patternComponent.column = { ...mockColumn, type: 'text' };
       patternComponent.value = 'Test Value';
       patternComponent.rowIndex = 0;
-      patternComponent.editConfig = { ...mockEditConfig, pattern: '^[a-zA-Z]+$', type: 'text' }; // Only letters
+      patternComponent.editConfig = {
+        ...mockEditConfig,
+        pattern: '^[a-zA-Z]+$',
+        type: 'text',
+      }; // Only letters
       patternComponent.editable = true;
-      
+
       patternFixture.detectChanges();
       patternComponent.startEdit();
       patternFixture.detectChanges();
-      
+
       // Set invalid pattern value and mark as touched
       patternComponent.cellControl.setValue('123');
       patternComponent.cellControl.markAsTouched();
@@ -412,7 +432,7 @@ describe('TableCellComponent', () => {
       // Create a fresh component with custom validation
       const customFixture = TestBed.createComponent(TableCellComponent);
       const customComponent = customFixture.componentInstance;
-      
+
       const customValidators: ValidatorConfig[] = [
         {
           type: 'custom',
@@ -420,21 +440,21 @@ describe('TableCellComponent', () => {
           message: 'Cannot use the word "invalid"',
         },
       ];
-      
+
       customComponent.column = { ...mockColumn, type: 'text' };
       customComponent.value = 'Test Value';
       customComponent.rowIndex = 0;
       customComponent.editConfig = {
         ...mockEditConfig,
         validators: customValidators,
-        type: 'text'
+        type: 'text',
       };
       customComponent.editable = true;
-      
+
       customFixture.detectChanges();
       customComponent.startEdit();
       customFixture.detectChanges();
-      
+
       // Set invalid value and mark as touched
       customComponent.cellControl.setValue('invalid');
       customComponent.cellControl.markAsTouched();
@@ -455,21 +475,25 @@ describe('TableCellComponent', () => {
       // Create a fresh component for ng-invalid class test
       const invalidFixture = TestBed.createComponent(TableCellComponent);
       const invalidComponent = invalidFixture.componentInstance;
-      
+
       invalidComponent.column = { ...mockColumn, type: 'text' };
       invalidComponent.value = 'Test Value';
       invalidComponent.rowIndex = 0;
-      invalidComponent.editConfig = { ...mockEditConfig, required: true, type: 'text' };
+      invalidComponent.editConfig = {
+        ...mockEditConfig,
+        required: true,
+        type: 'text',
+      };
       invalidComponent.editable = true;
-      
+
       invalidFixture.detectChanges();
       invalidComponent.startEdit();
       invalidFixture.detectChanges();
-      
+
       const inputQuery = invalidFixture.debugElement.query(By.css('input'));
       expect(inputQuery).toBeTruthy();
       const inputElement = inputQuery.nativeElement;
-      
+
       invalidComponent.cellControl.setValue('');
       invalidComponent.cellControl.markAsTouched();
       invalidComponent.cellControl.markAsDirty();

@@ -137,7 +137,7 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isEditing = true;
     this.cellControl.setValue(this.value);
     this.cellControl.markAsPristine();
-    
+
     // Trigger change detection for OnPush strategy
     this.cd.markForCheck();
 
@@ -163,7 +163,7 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
     const oldValue = this.value;
     this.value = this.cellControl.value;
     this.isEditing = false;
-    
+
     // Trigger change detection for OnPush strategy
     this.cd.markForCheck();
 
@@ -184,7 +184,7 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   cancelEdit(): void {
     this.isEditing = false;
     this.cellControl.setValue(this.originalValue);
-    
+
     // Trigger change detection for OnPush strategy
     this.cd.markForCheck();
 
