@@ -12,6 +12,7 @@ import { TableRow } from '../interfaces/table-row.interface';
 
 @Component({
   selector: 'tng-table-row',
+  standalone: false,
   templateUrl: './table-row.component.html',
   styleUrls: ['./table-row.component.scss'],
 })

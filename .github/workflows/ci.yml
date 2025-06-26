@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22.12'
           cache: 'npm'
 
       - name: Install dependencies
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18, 20]
+        node-version: [22.12, 22]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -62,7 +62,7 @@ jobs:
         run: npm run test:ci
 
       - name: Upload coverage reports
-        if: matrix.node-version == '18'
+        if: matrix.node-version == '22.12'
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage/lcov.info
@@ -80,7 +80,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22.12'
           cache: 'npm'
 
       - name: Install dependencies
@@ -113,7 +113,7 @@ jobs:
     needs: [build]
     strategy:
       matrix:
-        angular-version: ['16', '17', '18']
+        angular-version: ['19', '20']
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -121,7 +121,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22.12'
           cache: 'npm'
 
       - name: Download build artifacts
@@ -133,9 +133,10 @@ jobs:
       - name: Test Angular ${{ matrix.angular-version }} compatibility
         run: |
           npm install -g @angular/cli@${{ matrix.angular-version }}
+          cd /tmp
           ng new test-app --routing --style=css --skip-git --package-manager=npm
           cd test-app
-          npm install ../dist/tableng
+          npm install ${{ github.workspace }}/dist/tableng
           ng build --configuration production
 
   security:
@@ -148,7 +149,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22.12'
           cache: 'npm'
 
       - name: Install dependencies
@@ -181,7 +182,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22.12'
           cache: 'npm'
 
       - name: Install dependencies
@@ -201,7 +202,14 @@ jobs:
       - name: Check bundle size
         run: |
           cd dist/tableng
-          SIZE=$(wc -c < bundles/tableng.umd.min.js)
+          # Check for the actual ES module bundle
+          BUNDLE_FILE="fesm2022/edi_smooth-tableng.mjs"
+          if [ ! -f "$BUNDLE_FILE" ]; then
+            echo "Bundle file not found: $BUNDLE_FILE"
+            ls -la fesm2022/
+            exit 1
+          fi
+          SIZE=$(wc -c <"$BUNDLE_FILE")
           echo "Bundle size: $SIZE bytes"
           if [ $SIZE -gt 1048576 ]; then # 1MB limit
             echo "Bundle size exceeds 1MB limit"
@@ -227,7 +235,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22.12'
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
@@ -251,7 +259,10 @@ jobs:
       - name: Validate package.json
         run: |
           cd dist/tableng
-          npm pkg validate
+          # Check if package.json is valid JSON and has required fields
+          node -e "const pkg = require('./package.json'); console.log('Package name:', pkg.name); console.log('Version:', pkg.version); if (!pkg.name || !pkg.version) throw new Error('Missing required fields')"
+          # Check if package can be packed without errors
+          npm pack --dry-run
 
   all-checks:
     name: All Checks Passed

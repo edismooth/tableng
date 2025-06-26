@@ -23,6 +23,8 @@ module.exports = tseslint.config(
           style: 'kebab-case',
         },
       ],
+      // Disable prefer-standalone as we intentionally use module-based components
+      '@angular-eslint/prefer-standalone': 'off',
     },
   },
   {

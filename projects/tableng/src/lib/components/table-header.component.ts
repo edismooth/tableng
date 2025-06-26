@@ -12,6 +12,7 @@ import { SortState, FilterState } from '../services/table-state.service';
  */
 @Component({
   selector: 'tng-table-header',
+  standalone: false,
   templateUrl: './table-header.component.html',
   styleUrls: ['./table-header.component.scss'],
 })

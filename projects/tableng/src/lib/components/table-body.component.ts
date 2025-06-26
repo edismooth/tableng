@@ -41,6 +41,7 @@ export interface CellChangeEvent {
  */
 @Component({
   selector: 'tng-table-body',
+  standalone: false,
   templateUrl: './table-body.component.html',
   styleUrls: ['./table-body.component.scss'],
 })

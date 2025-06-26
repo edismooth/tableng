@@ -1,5 +1,5 @@
 {
-  "name": "tableng",
+  "name": "@edi_smooth/tableng",
   "version": "1.0.0",
   "description": "A modern, feature-rich Angular table library designed for performance and developer experience",
   "keywords": [
@@ -25,8 +25,8 @@
     "url": "https://github.com/oskargembalski/tableng/issues"
   },
   "peerDependencies": {
-    "@angular/common": "^16.2.0",
-    "@angular/core": "^16.2.0"
+    "@angular/common": "^20.0.0",
+    "@angular/core": "^20.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
@@ -42,7 +42,7 @@
     "lib"
   ],
   "engines": {
-    "node": ">=16.0.0",
+    "node": ">=20.19.0",
     "npm": ">=8.0.0"
   }
 }

@@ -27,6 +27,7 @@ import { TableRow } from './interfaces/table-row.interface';
 
 @Component({
   selector: 'tng-tableng',
+  standalone: false,
   templateUrl: './tableng.component.html',
   styleUrls: ['./tableng.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

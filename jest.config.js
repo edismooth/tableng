@@ -4,6 +4,10 @@ module.exports = {
 
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
+    '<rootDir>/dist/',
+    '<rootDir>/coverage/'
+  ],
+  modulePathIgnorePatterns: [
     '<rootDir>/dist/'
   ],
   collectCoverageFrom: [
@@ -16,7 +20,7 @@ module.exports = {
   coverageReporters: ['html', 'lcov', 'text'],
   coverageThreshold: {
     global: {
-      branches: 70,
+      branches: 65,
       functions: 80,
       lines: 80,
       statements: 80

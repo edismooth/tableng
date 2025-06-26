@@ -9,6 +9,7 @@ import {
   ViewChild,
   AfterViewInit,
   ChangeDetectorRef,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import {
   FormControl,
@@ -22,8 +23,10 @@ import { ValidatorConfig } from '../interfaces/validator-config.interface';
 
 @Component({
   selector: 'tng-table-cell',
+  standalone: false,
   templateUrl: './table-cell.component.html',
   styleUrls: ['./table-cell.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() column!: ColumnDefinition;
@@ -135,6 +138,9 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
     this.cellControl.setValue(this.value);
     this.cellControl.markAsPristine();
 
+    // Trigger change detection for OnPush strategy
+    this.cd.markForCheck();
+
     this.editStart.emit({
       column: this.column.key,
       rowIndex: this.rowIndex,
@@ -158,6 +164,9 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
     this.value = this.cellControl.value;
     this.isEditing = false;
 
+    // Trigger change detection for OnPush strategy
+    this.cd.markForCheck();
+
     this.valueChange.emit({
       column: this.column.key,
       rowIndex: this.rowIndex,
@@ -175,6 +184,9 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   cancelEdit(): void {
     this.isEditing = false;
     this.cellControl.setValue(this.originalValue);
+
+    // Trigger change detection for OnPush strategy
+    this.cd.markForCheck();
 
     this.editCancel.emit({
       column: this.column.key,
