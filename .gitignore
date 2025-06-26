@@ -55,8 +55,8 @@ Thumbs.db
 .env.test.local
 .env.production.local
 
-# Package manager lockfiles (keep only one)
-package-lock.json
+# Package manager lockfiles (keep only one, exclude the others)
+# package-lock.json - Keep this for npm
 yarn.lock
 pnpm-lock.yaml
 
