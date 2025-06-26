@@ -104,12 +104,19 @@ describe('TableCellComponent', () => {
     });
 
     it('should not apply editable styling when editable is false', () => {
-      component.editable = false;
-      component.editConfig = { ...mockEditConfig, readonly: false, disabled: false }; // Ensure not readonly/disabled
-      component.ngOnInit(); // Re-trigger initialization
-      fixture.detectChanges();
+      // Create fresh component instance to avoid state pollution
+      const freshFixture = TestBed.createComponent(TableCellComponent);
+      const freshComponent = freshFixture.componentInstance;
+      
+      freshComponent.column = mockColumn;
+      freshComponent.value = 'Test Value';
+      freshComponent.rowIndex = 0;
+      freshComponent.editConfig = { ...mockEditConfig, readonly: false, disabled: false };
+      freshComponent.editable = false; // Set to false
+      
+      freshFixture.detectChanges();
 
-      const cellElement = fixture.debugElement.query(By.css('.tableng-cell'));
+      const cellElement = freshFixture.debugElement.query(By.css('.tableng-cell'));
       expect(cellElement.nativeElement.classList).not.toContain(
         'tableng-cell-editable'
       );
@@ -127,45 +134,59 @@ describe('TableCellComponent', () => {
     });
 
     it('should format different data types correctly', () => {
-      // Test boolean formatting
-      component.column = { ...mockColumn, type: 'boolean' };
-      component.value = true;
-      component.ngOnInit(); // Re-trigger initialization to update formatting
-      fixture.detectChanges();
+      // Test boolean formatting - create fresh component
+      const boolFixture = TestBed.createComponent(TableCellComponent);
+      const boolComponent = boolFixture.componentInstance;
+      boolComponent.column = { ...mockColumn, type: 'boolean' };
+      boolComponent.value = true;
+      boolComponent.rowIndex = 0;
+      boolComponent.editable = false;
+      boolFixture.detectChanges();
 
-      let content = fixture.debugElement.query(By.css('.tableng-cell-content'));
+      let content = boolFixture.debugElement.query(By.css('.tableng-cell-content'));
       expect(content.nativeElement.textContent.trim()).toBe('Yes');
 
-      // Test number formatting
-      component.column = { ...mockColumn, type: 'number' };
-      component.value = 1234.56;
-      component.ngOnInit(); // Re-trigger initialization
-      fixture.detectChanges();
+      // Test number formatting - create fresh component
+      const numFixture = TestBed.createComponent(TableCellComponent);
+      const numComponent = numFixture.componentInstance;
+      numComponent.column = { ...mockColumn, type: 'number' };
+      numComponent.value = 1234.56;
+      numComponent.rowIndex = 0;
+      numComponent.editable = false;
+      numFixture.detectChanges();
 
-      content = fixture.debugElement.query(By.css('.tableng-cell-content'));
+      content = numFixture.debugElement.query(By.css('.tableng-cell-content'));
       expect(content.nativeElement.textContent.trim()).toBe('1234.56');
 
-      // Test date formatting
-      component.column = { ...mockColumn, type: 'date' };
-      component.value = new Date('2023-01-01');
-      component.ngOnInit(); // Re-trigger initialization
-      fixture.detectChanges();
+      // Test date formatting - create fresh component
+      const dateFixture = TestBed.createComponent(TableCellComponent);
+      const dateComponent = dateFixture.componentInstance;
+      dateComponent.column = { ...mockColumn, type: 'date' };
+      dateComponent.value = new Date('2023-01-01');
+      dateComponent.rowIndex = 0;
+      dateComponent.editable = false;
+      dateFixture.detectChanges();
 
-      content = fixture.debugElement.query(By.css('.tableng-cell-content'));
+      content = dateFixture.debugElement.query(By.css('.tableng-cell-content'));
       expect(content.nativeElement.textContent.trim()).toContain('2023');
     });
 
     it('should use custom formatter when provided', () => {
-      component.column = {
+      // Create fresh component for custom formatter test
+      const customFixture = TestBed.createComponent(TableCellComponent);
+      const customComponent = customFixture.componentInstance;
+      
+      customComponent.column = {
         ...mockColumn,
         formatter: (value: unknown) =>
           typeof value === 'string' ? value.toUpperCase() : String(value),
       };
-      component.value = 'test value';
-      component.ngOnInit(); // Re-trigger initialization with new formatter
-      fixture.detectChanges();
+      customComponent.value = 'test value';
+      customComponent.rowIndex = 0;
+      customComponent.editable = false;
+      customFixture.detectChanges();
 
-      const content = fixture.debugElement.query(
+      const content = customFixture.debugElement.query(
         By.css('.tableng-cell-content')
       );
       expect(content.nativeElement.textContent.trim()).toBe('TEST VALUE');
@@ -295,17 +316,28 @@ describe('TableCellComponent', () => {
     });
 
     it('should show validation error for required field', fakeAsync(() => {
-      component.editConfig = { ...mockEditConfig, required: true };
-      (component as any).setupFormControl(); // Re-initialize to apply new config
-      fixture.detectChanges();
-
-      component.cellControl.setValue('');
-      component.cellControl.markAsTouched();
-      component.cellControl.updateValueAndValidity();
+      // Create a fresh component with required validation
+      const validationFixture = TestBed.createComponent(TableCellComponent);
+      const validationComponent = validationFixture.componentInstance;
+      
+      validationComponent.column = { ...mockColumn, type: 'text' };
+      validationComponent.value = 'Test Value';
+      validationComponent.rowIndex = 0;
+      validationComponent.editConfig = { ...mockEditConfig, required: true, type: 'text' };
+      validationComponent.editable = true;
+      
+      validationFixture.detectChanges();
+      validationComponent.startEdit();
+      validationFixture.detectChanges();
+      
+      // Set invalid value and mark as touched
+      validationComponent.cellControl.setValue('');
+      validationComponent.cellControl.markAsTouched();
+      validationComponent.cellControl.markAsDirty();
       tick();
-      fixture.detectChanges();
+      validationFixture.detectChanges();
 
-      const errorElement = fixture.debugElement.query(
+      const errorElement = validationFixture.debugElement.query(
         By.css('.tableng-validation-error')
       );
       expect(errorElement).toBeTruthy();
@@ -315,17 +347,28 @@ describe('TableCellComponent', () => {
     }));
 
     it('should show validation error for minLength', fakeAsync(() => {
-      component.editConfig = { ...mockEditConfig, minLength: 5 };
-      (component as any).setupFormControl();
-      fixture.detectChanges();
-
-      component.cellControl.setValue('123');
-      component.cellControl.markAsTouched();
-      component.cellControl.updateValueAndValidity();
+      // Create a fresh component with minLength validation
+      const minLengthFixture = TestBed.createComponent(TableCellComponent);
+      const minLengthComponent = minLengthFixture.componentInstance;
+      
+      minLengthComponent.column = { ...mockColumn, type: 'text' };
+      minLengthComponent.value = 'Test Value';
+      minLengthComponent.rowIndex = 0;
+      minLengthComponent.editConfig = { ...mockEditConfig, minLength: 5, type: 'text' };
+      minLengthComponent.editable = true;
+      
+      minLengthFixture.detectChanges();
+      minLengthComponent.startEdit();
+      minLengthFixture.detectChanges();
+      
+      // Set short value and mark as touched
+      minLengthComponent.cellControl.setValue('123');
+      minLengthComponent.cellControl.markAsTouched();
+      minLengthComponent.cellControl.markAsDirty();
       tick();
-      fixture.detectChanges();
+      minLengthFixture.detectChanges();
 
-      const errorElement = fixture.debugElement.query(
+      const errorElement = minLengthFixture.debugElement.query(
         By.css('.tableng-validation-error')
       );
       expect(errorElement).toBeTruthy();
@@ -335,17 +378,28 @@ describe('TableCellComponent', () => {
     }));
 
     it('should show validation error for pattern', fakeAsync(() => {
-      component.editConfig = { ...mockEditConfig, pattern: '^[a-zA-Z]+$' }; // Only letters
-      (component as any).setupFormControl();
-      fixture.detectChanges();
-
-      component.cellControl.setValue('123');
-      component.cellControl.markAsTouched();
-      component.cellControl.updateValueAndValidity();
+      // Create a fresh component with pattern validation
+      const patternFixture = TestBed.createComponent(TableCellComponent);
+      const patternComponent = patternFixture.componentInstance;
+      
+      patternComponent.column = { ...mockColumn, type: 'text' };
+      patternComponent.value = 'Test Value';
+      patternComponent.rowIndex = 0;
+      patternComponent.editConfig = { ...mockEditConfig, pattern: '^[a-zA-Z]+$', type: 'text' }; // Only letters
+      patternComponent.editable = true;
+      
+      patternFixture.detectChanges();
+      patternComponent.startEdit();
+      patternFixture.detectChanges();
+      
+      // Set invalid pattern value and mark as touched
+      patternComponent.cellControl.setValue('123');
+      patternComponent.cellControl.markAsTouched();
+      patternComponent.cellControl.markAsDirty();
       tick();
-      fixture.detectChanges();
+      patternFixture.detectChanges();
 
-      const errorElement = fixture.debugElement.query(
+      const errorElement = patternFixture.debugElement.query(
         By.css('.tableng-validation-error')
       );
       expect(errorElement).toBeTruthy();
@@ -355,6 +409,10 @@ describe('TableCellComponent', () => {
     }));
 
     it('should show custom validation error message', fakeAsync(() => {
+      // Create a fresh component with custom validation
+      const customFixture = TestBed.createComponent(TableCellComponent);
+      const customComponent = customFixture.componentInstance;
+      
       const customValidators: ValidatorConfig[] = [
         {
           type: 'custom',
@@ -362,20 +420,29 @@ describe('TableCellComponent', () => {
           message: 'Cannot use the word "invalid"',
         },
       ];
-      component.editConfig = {
+      
+      customComponent.column = { ...mockColumn, type: 'text' };
+      customComponent.value = 'Test Value';
+      customComponent.rowIndex = 0;
+      customComponent.editConfig = {
         ...mockEditConfig,
         validators: customValidators,
+        type: 'text'
       };
-      (component as any).setupFormControl();
-      fixture.detectChanges();
-
-      component.cellControl.setValue('invalid');
-      component.cellControl.markAsTouched();
-      component.cellControl.updateValueAndValidity();
+      customComponent.editable = true;
+      
+      customFixture.detectChanges();
+      customComponent.startEdit();
+      customFixture.detectChanges();
+      
+      // Set invalid value and mark as touched
+      customComponent.cellControl.setValue('invalid');
+      customComponent.cellControl.markAsTouched();
+      customComponent.cellControl.markAsDirty();
       tick();
-      fixture.detectChanges();
+      customFixture.detectChanges();
 
-      const errorElement = fixture.debugElement.query(
+      const errorElement = customFixture.debugElement.query(
         By.css('.tableng-validation-error')
       );
       expect(errorElement).toBeTruthy();
@@ -385,18 +452,29 @@ describe('TableCellComponent', () => {
     }));
 
     it('should apply ng-invalid class to input on error', fakeAsync(() => {
-      component.editConfig = { ...mockEditConfig, required: true };
-      (component as any).setupFormControl();
-      fixture.detectChanges();
-
-      const inputQuery = fixture.debugElement.query(By.css('input'));
+      // Create a fresh component for ng-invalid class test
+      const invalidFixture = TestBed.createComponent(TableCellComponent);
+      const invalidComponent = invalidFixture.componentInstance;
+      
+      invalidComponent.column = { ...mockColumn, type: 'text' };
+      invalidComponent.value = 'Test Value';
+      invalidComponent.rowIndex = 0;
+      invalidComponent.editConfig = { ...mockEditConfig, required: true, type: 'text' };
+      invalidComponent.editable = true;
+      
+      invalidFixture.detectChanges();
+      invalidComponent.startEdit();
+      invalidFixture.detectChanges();
+      
+      const inputQuery = invalidFixture.debugElement.query(By.css('input'));
       expect(inputQuery).toBeTruthy();
       const inputElement = inputQuery.nativeElement;
-      component.cellControl.setValue('');
-      component.cellControl.markAsTouched();
-      component.cellControl.updateValueAndValidity();
+      
+      invalidComponent.cellControl.setValue('');
+      invalidComponent.cellControl.markAsTouched();
+      invalidComponent.cellControl.markAsDirty();
       tick();
-      fixture.detectChanges();
+      invalidFixture.detectChanges();
 
       expect(inputElement.classList).toContain('ng-invalid');
     }));
