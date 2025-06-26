@@ -9,6 +9,7 @@
   "bracketSpacing": true,
   "arrowParens": "avoid",
   "htmlWhitespaceSensitivity": "ignore",
+  "plugins": ["prettier-plugin-tailwindcss"],
   "overrides": [
     {
       "files": "*.html",
@@ -17,4 +18,4 @@
       }
     }
   ]
-} 
+}

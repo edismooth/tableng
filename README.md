@@ -32,6 +32,24 @@ TableNG provides extensive customization options:
 - **Component-level Styling**: Granular control over appearance
 - **Conditional Styling**: Style based on data values
 
+## 🌐 Website Development
+
+This project includes a frontend for documentation and examples. Here's how to get started with development:
+
+### Development Commands
+
+- **Serve Locally**: `npm run start` to serve the website locally.
+- **Build**: `npm run build:prod` to build the production version.
+- **Watch**: `npm run build:watch` for continuous build during development.
+
+### Folder Structure
+
+The project is organized as follows:
+
+- `projects/tableng` - Angular components and logic.
+- `docs/` - Markdown files for documentation.
+- `examples/` - Example implementations and usage.
+
 ## 📦 Installation
 
 ```bash
@@ -72,7 +90,10 @@ See our [development roadmap](roadmap.md) for planned features and current progr
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our contribution guides:
+
+- [General Contributing Guide](CONTRIBUTING.md) - For code contributions
+- [Website Contributing Guide](CONTRIBUTING_WEBSITE.md) - For documentation and examples
 
 ## 📄 License
 
@@ -82,6 +103,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Bug Reports](https://github.com/edismooth/tableng/issues/new?template=bug_report.md)
 - [Feature Requests](https://github.com/edismooth/tableng/issues/new?template=feature_request.md)
+- [Documentation Issues](https://github.com/edismooth/tableng/issues/new?template=documentation_bug.md)
+- [Website Issues](https://github.com/edismooth/tableng/issues/new?template=website_bug.md)
 - [Discussions](https://github.com/edismooth/tableng/discussions)
 
 ## 🚧 Development Status

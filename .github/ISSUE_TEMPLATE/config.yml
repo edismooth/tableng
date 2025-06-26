@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussion Forum
+    url: https://github.com/edismooth/tableng/discussions
+    about: Ask questions and discuss TableNG features with the community
+  - name: 📚 Documentation
+    url: https://github.com/edismooth/tableng#-documentation
+    about: Read the official documentation and guides
+  - name: 🚀 Examples
+    url: https://github.com/edismooth/tableng/tree/main/examples
+    about: Browse code examples and live demos

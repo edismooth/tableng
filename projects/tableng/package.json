@@ -19,7 +19,7 @@
   "homepage": "https://github.com/oskargembalski/tableng",
   "repository": {
     "type": "git",
-    "url": "https://github.com/oskargembalski/tableng.git"
+    "url": "git+https://github.com/oskargembalski/tableng.git"
   },
   "bugs": {
     "url": "https://github.com/oskargembalski/tableng/issues"
@@ -31,5 +31,18 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "files": [
+    "*.d.ts",
+    "*.md",
+    "bundles",
+    "esm2022",
+    "fesm2020",
+    "fesm2022",
+    "lib"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
 }

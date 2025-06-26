@@ -2,6 +2,7 @@
 const eslint = require("@eslint/js");
 const tseslint = require("typescript-eslint");
 const angular = require("angular-eslint");
+const tailwindcss = require("eslint-plugin-tailwindcss");
 
 module.exports = tseslint.config(
   {
@@ -38,6 +39,13 @@ module.exports = tseslint.config(
       ...angular.configs.templateRecommended,
       ...angular.configs.templateAccessibility,
     ],
-    rules: {},
+    plugins: {
+      tailwindcss: tailwindcss,
+    },
+    rules: {
+      "tailwindcss/classnames-order": "warn",
+      "tailwindcss/no-custom-classname": "warn",
+      "tailwindcss/no-contradicting-classname": "error",
+    },
   }
 );

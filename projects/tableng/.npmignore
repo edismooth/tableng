@@ -1,0 +1,38 @@
+# Source files
+src/
+*.ts
+!*.d.ts
+
+# Build files
+node_modules/
+*.tgz
+*.log
+
+# Test files
+**/*.spec.ts
+**/*.spec.js
+karma.conf.js
+jest.config.js
+
+# Config files
+tsconfig*.json
+angular.json
+.eslintrc*
+.editorconfig
+.gitignore
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# CI files
+.github/
+.travis.yml
+.circleci/
