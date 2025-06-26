@@ -9,6 +9,7 @@ import {
   ViewChild,
   AfterViewInit,
   ChangeDetectorRef,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import {
   FormControl,
@@ -22,8 +23,10 @@ import { ValidatorConfig } from '../interfaces/validator-config.interface';
 
 @Component({
   selector: 'tng-table-cell',
+  standalone: false,
   templateUrl: './table-cell.component.html',
   styleUrls: ['./table-cell.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() column!: ColumnDefinition;
