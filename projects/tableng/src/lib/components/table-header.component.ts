@@ -1,5 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { ColumnDefinition, SortDirection } from '../interfaces/column-definition.interface';
+import {
+  ColumnDefinition,
+  SortDirection,
+} from '../interfaces/column-definition.interface';
 import { TableConfig } from '../interfaces/table-config.interface';
 import { SortState, FilterState } from '../services/table-state.service';
 
@@ -10,7 +13,7 @@ import { SortState, FilterState } from '../services/table-state.service';
 @Component({
   selector: 'tng-table-header',
   templateUrl: './table-header.component.html',
-  styleUrls: ['./table-header.component.scss']
+  styleUrls: ['./table-header.component.scss'],
 })
 export class TableHeaderComponent {
   @Input() columns: ColumnDefinition[] = [];
@@ -19,10 +22,22 @@ export class TableHeaderComponent {
   @Input() filterState?: FilterState;
   @Input() stickyHeader = false;
 
-  @Output() sortChange = new EventEmitter<{ column: string; direction: SortDirection }>();
-  @Output() filterChange = new EventEmitter<{ column: string; value: string }>();
-  @Output() columnResize = new EventEmitter<{ column: string; width: number }>();
-  @Output() columnReorder = new EventEmitter<{ fromIndex: number; toIndex: number }>();
+  @Output() sortChange = new EventEmitter<{
+    column: string;
+    direction: SortDirection;
+  }>();
+  @Output() filterChange = new EventEmitter<{
+    column: string;
+    value: string;
+  }>();
+  @Output() columnResize = new EventEmitter<{
+    column: string;
+    width: number;
+  }>();
+  @Output() columnReorder = new EventEmitter<{
+    fromIndex: number;
+    toIndex: number;
+  }>();
 
   private currentSortColumn?: string;
   private currentSortDirection: SortDirection = 'none';
@@ -62,12 +77,16 @@ export class TableHeaderComponent {
 
     this.sortChange.emit({
       column: columnKey,
-      direction: newDirection
+      direction: newDirection,
     });
   }
 
   onKeyDown(event: KeyboardEvent, column: ColumnDefinition): void {
-    if ((event.key === 'Enter' || event.key === ' ') && column.sortable && this.config?.sorting) {
+    if (
+      (event.key === 'Enter' || event.key === ' ') &&
+      column.sortable &&
+      this.config?.sorting
+    ) {
       event.preventDefault();
       this.onColumnSort(column.key);
     }
@@ -79,7 +98,7 @@ export class TableHeaderComponent {
 
     this.filterChange.emit({
       column: column.key,
-      value: value
+      value: value,
     });
   }
 
@@ -92,10 +111,10 @@ export class TableHeaderComponent {
     const onMouseMove = (e: MouseEvent) => {
       const diff = e.clientX - startX;
       const newWidth = Math.max(50, startWidth + diff);
-      
+
       this.columnResize.emit({
         column: column.key,
-        width: newWidth
+        width: newWidth,
       });
     };
 
@@ -139,7 +158,7 @@ export class TableHeaderComponent {
 
   getHeaderCellClasses(column: ColumnDefinition): string[] {
     const classes = ['tableng-header-cell'];
-    
+
     if (column.sortable && this.config?.sorting) {
       classes.push('tableng-sortable');
     }
@@ -162,7 +181,7 @@ export class TableHeaderComponent {
 
   getSortIconClasses(column: ColumnDefinition): string[] {
     const classes = ['tableng-sort-icon'];
-    
+
     if (this.sortState?.column === column.key) {
       classes.push(`tableng-sort-${this.sortState.direction}`);
     }
@@ -202,4 +221,4 @@ export class TableHeaderComponent {
   getFilterValue(columnKey: string): string {
     return this.filterState?.[columnKey] || '';
   }
-} 
+}

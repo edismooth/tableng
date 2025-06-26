@@ -71,22 +71,22 @@ export type ShadowLevel = 'none' | 'low' | 'medium' | 'high';
 export interface TableTheme {
   /** Theme name */
   name: string;
-  
+
   /** Color configuration */
   colors?: ThemeColors;
-  
+
   /** Typography configuration */
   typography?: ThemeTypography;
-  
+
   /** Spacing configuration */
   spacing?: ThemeSpacing;
-  
+
   /** Border radius */
   borderRadius?: string;
-  
+
   /** Border width */
   borderWidth?: string;
-  
+
   /** Shadow level */
   shadowLevel?: ShadowLevel;
-} 
+}

@@ -9,38 +9,38 @@ describe('TableHeaderComponent', () => {
   let fixture: ComponentFixture<TableHeaderComponent>;
 
   const mockColumns: ColumnDefinition[] = [
-    { 
-      key: 'id', 
-      title: 'ID', 
-      type: 'number', 
-      width: 80, 
+    {
+      key: 'id',
+      title: 'ID',
+      type: 'number',
+      width: 80,
       sortable: true,
-      resizable: true 
+      resizable: true,
     },
-    { 
-      key: 'name', 
-      title: 'Name', 
-      type: 'text', 
-      width: 200, 
-      sortable: true, 
+    {
+      key: 'name',
+      title: 'Name',
+      type: 'text',
+      width: 200,
+      sortable: true,
       filterable: true,
-      resizable: true 
+      resizable: true,
     },
-    { 
-      key: 'email', 
-      title: 'Email', 
-      type: 'text', 
-      width: 250, 
+    {
+      key: 'email',
+      title: 'Email',
+      type: 'text',
+      width: 250,
       filterable: true,
-      resizable: false 
+      resizable: false,
     },
-    { 
-      key: 'active', 
-      title: 'Active', 
-      type: 'boolean', 
+    {
+      key: 'active',
+      title: 'Active',
+      type: 'boolean',
       width: 100,
-      sortable: false 
-    }
+      sortable: false,
+    },
   ];
 
   const mockConfig: TableConfig = {
@@ -49,17 +49,17 @@ describe('TableHeaderComponent', () => {
     sorting: true,
     filtering: true,
     resizable: true,
-    reorderable: true
+    reorderable: true,
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [TableHeaderComponent]
+      declarations: [TableHeaderComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TableHeaderComponent);
     component = fixture.componentInstance;
-    
+
     // Set default inputs
     component.columns = mockColumns;
     component.config = mockConfig;
@@ -91,20 +91,28 @@ describe('TableHeaderComponent', () => {
     });
 
     it('should render header container', () => {
-      const headerContainer = fixture.debugElement.query(By.css('.tableng-header'));
+      const headerContainer = fixture.debugElement.query(
+        By.css('.tableng-header')
+      );
       expect(headerContainer).toBeTruthy();
     });
 
     it('should render all column headers', () => {
-      const headerCells = fixture.debugElement.queryAll(By.css('.tableng-header-cell'));
+      const headerCells = fixture.debugElement.queryAll(
+        By.css('.tableng-header-cell')
+      );
       expect(headerCells.length).toBe(mockColumns.length);
     });
 
     it('should display column titles correctly', () => {
-      const headerCells = fixture.debugElement.queryAll(By.css('.tableng-header-cell-title'));
-      
+      const headerCells = fixture.debugElement.queryAll(
+        By.css('.tableng-header-cell-title')
+      );
+
       headerCells.forEach((cell, index) => {
-        expect(cell.nativeElement.textContent.trim()).toBe(mockColumns[index].title);
+        expect(cell.nativeElement.textContent.trim()).toBe(
+          mockColumns[index].title
+        );
       });
     });
 
@@ -112,20 +120,26 @@ describe('TableHeaderComponent', () => {
       component.stickyHeader = true;
       fixture.detectChanges();
 
-      const headerContainer = fixture.debugElement.query(By.css('.tableng-header'));
-      expect(headerContainer.nativeElement.classList).toContain('tableng-sticky-header');
+      const headerContainer = fixture.debugElement.query(
+        By.css('.tableng-header')
+      );
+      expect(headerContainer.nativeElement.classList).toContain(
+        'tableng-sticky-header'
+      );
     });
 
     it('should apply column-specific CSS classes', () => {
       const testColumn: ColumnDefinition = {
         ...mockColumns[0],
         cssClass: 'custom-column',
-        headerCssClass: 'custom-header'
+        headerCssClass: 'custom-header',
       };
       component.columns = [testColumn];
       fixture.detectChanges();
 
-      const headerCell = fixture.debugElement.query(By.css('.tableng-header-cell'));
+      const headerCell = fixture.debugElement.query(
+        By.css('.tableng-header-cell')
+      );
       expect(headerCell.nativeElement.classList).toContain('custom-column');
       expect(headerCell.nativeElement.classList).toContain('custom-header');
     });
@@ -137,21 +151,27 @@ describe('TableHeaderComponent', () => {
     });
 
     it('should show sort indicator for sortable columns', () => {
-      const sortableHeaders = fixture.debugElement.queryAll(By.css('.tableng-sortable'));
+      const sortableHeaders = fixture.debugElement.queryAll(
+        By.css('.tableng-sortable')
+      );
       expect(sortableHeaders.length).toBe(2); // id and name columns are sortable
     });
 
     it('should not show sort indicator for non-sortable columns', () => {
-      const nonSortableHeader = fixture.debugElement.queryAll(By.css('.tableng-header-cell'))[3]; // active column
+      const nonSortableHeader = fixture.debugElement.queryAll(
+        By.css('.tableng-header-cell')
+      )[3]; // active column
       const sortIcon = nonSortableHeader.query(By.css('.tableng-sort-icon'));
       expect(sortIcon).toBeFalsy();
     });
 
     it('should emit sortChange event when clicking sortable column', () => {
       let emittedSortData: any;
-      component.sortChange.subscribe((data: any) => emittedSortData = data);
+      component.sortChange.subscribe((data: any) => (emittedSortData = data));
 
-      const sortableHeader = fixture.debugElement.query(By.css('.tableng-sortable'));
+      const sortableHeader = fixture.debugElement.query(
+        By.css('.tableng-sortable')
+      );
       sortableHeader.triggerEventHandler('click', null);
 
       expect(emittedSortData).toBeDefined();
@@ -163,8 +183,10 @@ describe('TableHeaderComponent', () => {
       const sortData: any[] = [];
       component.sortChange.subscribe((data: any) => sortData.push(data));
 
-      const sortableHeader = fixture.debugElement.query(By.css('.tableng-sortable'));
-      
+      const sortableHeader = fixture.debugElement.query(
+        By.css('.tableng-sortable')
+      );
+
       // First click: asc
       sortableHeader.triggerEventHandler('click', null);
       expect(sortData[0].direction).toBe('asc');
@@ -184,10 +206,14 @@ describe('TableHeaderComponent', () => {
       component.sortState = { column: 'name', direction: 'asc' };
       fixture.detectChanges();
 
-      const nameHeader = fixture.debugElement.queryAll(By.css('.tableng-header-cell'))[1];
+      const nameHeader = fixture.debugElement.queryAll(
+        By.css('.tableng-header-cell')
+      )[1];
       const sortIcon = nameHeader.query(By.css('.tableng-sort-icon'));
-      
-      expect(nameHeader.nativeElement.classList).toContain('tableng-sorted-asc');
+
+      expect(nameHeader.nativeElement.classList).toContain(
+        'tableng-sorted-asc'
+      );
       expect(sortIcon).toBeTruthy();
     });
   });
@@ -198,23 +224,33 @@ describe('TableHeaderComponent', () => {
     });
 
     it('should show filter input for filterable columns', () => {
-      const filterInputs = fixture.debugElement.queryAll(By.css('.tableng-filter-input'));
+      const filterInputs = fixture.debugElement.queryAll(
+        By.css('.tableng-filter-input')
+      );
       expect(filterInputs.length).toBe(2); // name and email columns are filterable
     });
 
     it('should not show filter input for non-filterable columns', () => {
-      const idHeader = fixture.debugElement.queryAll(By.css('.tableng-header-cell'))[0];
+      const idHeader = fixture.debugElement.queryAll(
+        By.css('.tableng-header-cell')
+      )[0];
       const filterInput = idHeader.query(By.css('.tableng-filter-input'));
       expect(filterInput).toBeFalsy();
     });
 
     it('should emit filterChange event when filter input changes', () => {
       let emittedFilterData: any;
-      component.filterChange.subscribe((data: any) => emittedFilterData = data);
+      component.filterChange.subscribe(
+        (data: any) => (emittedFilterData = data)
+      );
 
-      const filterInput = fixture.debugElement.query(By.css('.tableng-filter-input'));
+      const filterInput = fixture.debugElement.query(
+        By.css('.tableng-filter-input')
+      );
       filterInput.nativeElement.value = 'test filter';
-      filterInput.triggerEventHandler('input', { target: { value: 'test filter' } });
+      filterInput.triggerEventHandler('input', {
+        target: { value: 'test filter' },
+      });
 
       expect(emittedFilterData).toBeDefined();
       expect(emittedFilterData.column).toBe('name');
@@ -223,9 +259,13 @@ describe('TableHeaderComponent', () => {
 
     it('should clear filter when input is emptied', () => {
       let emittedFilterData: any;
-      component.filterChange.subscribe((data: any) => emittedFilterData = data);
+      component.filterChange.subscribe(
+        (data: any) => (emittedFilterData = data)
+      );
 
-      const filterInput = fixture.debugElement.query(By.css('.tableng-filter-input'));
+      const filterInput = fixture.debugElement.query(
+        By.css('.tableng-filter-input')
+      );
       filterInput.nativeElement.value = '';
       filterInput.triggerEventHandler('input', { target: { value: '' } });
 
@@ -239,19 +279,25 @@ describe('TableHeaderComponent', () => {
     });
 
     it('should show resize handle for resizable columns', () => {
-      const resizeHandles = fixture.debugElement.queryAll(By.css('.tableng-resize-handle'));
+      const resizeHandles = fixture.debugElement.queryAll(
+        By.css('.tableng-resize-handle')
+      );
       expect(resizeHandles.length).toBe(2); // id, name columns are resizable (email and active are not)
     });
 
     it('should not show resize handle for non-resizable columns', () => {
-      const emailHeader = fixture.debugElement.queryAll(By.css('.tableng-header-cell'))[2];
+      const emailHeader = fixture.debugElement.queryAll(
+        By.css('.tableng-header-cell')
+      )[2];
       const resizeHandle = emailHeader.query(By.css('.tableng-resize-handle'));
       expect(resizeHandle).toBeFalsy();
     });
 
     it('should emit columnResize event when resizing', () => {
       let emittedResizeData: any;
-      component.columnResize.subscribe((data: any) => emittedResizeData = data);
+      component.columnResize.subscribe(
+        (data: any) => (emittedResizeData = data)
+      );
 
       const resizeData = { column: 'name', width: 250 };
       component.onColumnResize(resizeData);
@@ -260,8 +306,10 @@ describe('TableHeaderComponent', () => {
     });
 
     it('should apply column widths from configuration', () => {
-      const headerCells = fixture.debugElement.queryAll(By.css('.tableng-header-cell'));
-      
+      const headerCells = fixture.debugElement.queryAll(
+        By.css('.tableng-header-cell')
+      );
+
       headerCells.forEach((cell, index) => {
         const expectedWidth = mockColumns[index].width;
         if (expectedWidth) {
@@ -278,8 +326,10 @@ describe('TableHeaderComponent', () => {
     });
 
     it('should make headers draggable when reordering enabled', () => {
-      const headerCells = fixture.debugElement.queryAll(By.css('.tableng-header-cell'));
-      
+      const headerCells = fixture.debugElement.queryAll(
+        By.css('.tableng-header-cell')
+      );
+
       headerCells.forEach(cell => {
         expect(cell.nativeElement.draggable).toBe(true);
       });
@@ -287,7 +337,9 @@ describe('TableHeaderComponent', () => {
 
     it('should emit columnReorder event when reordering', () => {
       let emittedReorderData: any;
-      component.columnReorder.subscribe((data: any) => emittedReorderData = data);
+      component.columnReorder.subscribe(
+        (data: any) => (emittedReorderData = data)
+      );
 
       const reorderData = { fromIndex: 0, toIndex: 1 };
       component.onColumnReorder(reorderData);
@@ -296,12 +348,16 @@ describe('TableHeaderComponent', () => {
     });
 
     it('should apply visual feedback during drag operations', () => {
-      const headerCell = fixture.debugElement.query(By.css('.tableng-header-cell'));
-      
+      const headerCell = fixture.debugElement.query(
+        By.css('.tableng-header-cell')
+      );
+
       // Start drag
-      headerCell.triggerEventHandler('dragstart', { target: headerCell.nativeElement });
+      headerCell.triggerEventHandler('dragstart', {
+        target: headerCell.nativeElement,
+      });
       fixture.detectChanges();
-      
+
       expect(headerCell.nativeElement.classList).toContain('tableng-dragging');
     });
   });
@@ -312,29 +368,48 @@ describe('TableHeaderComponent', () => {
     });
 
     it('should have proper ARIA attributes for sorting', () => {
-      const sortableHeader = fixture.debugElement.query(By.css('.tableng-sortable'));
-      
-      expect(sortableHeader.nativeElement.getAttribute('role')).toBe('columnheader');
-      expect(sortableHeader.nativeElement.getAttribute('aria-sort')).toBeTruthy();
+      const sortableHeader = fixture.debugElement.query(
+        By.css('.tableng-sortable')
+      );
+
+      expect(sortableHeader.nativeElement.getAttribute('role')).toBe(
+        'columnheader'
+      );
+      expect(
+        sortableHeader.nativeElement.getAttribute('aria-sort')
+      ).toBeTruthy();
       expect(sortableHeader.nativeElement.getAttribute('tabindex')).toBe('0');
     });
 
     it('should have proper labels for filter inputs', () => {
-      const filterInput = fixture.debugElement.query(By.css('.tableng-filter-input'));
-      
-      expect(filterInput.nativeElement.getAttribute('aria-label')).toContain('Filter');
-      expect(filterInput.nativeElement.getAttribute('placeholder')).toBeTruthy();
+      const filterInput = fixture.debugElement.query(
+        By.css('.tableng-filter-input')
+      );
+
+      expect(filterInput.nativeElement.getAttribute('aria-label')).toContain(
+        'Filter'
+      );
+      expect(
+        filterInput.nativeElement.getAttribute('placeholder')
+      ).toBeTruthy();
     });
 
     it('should support keyboard navigation for sorting', () => {
       let emittedSortData: any;
-      component.sortChange.subscribe((data: any) => emittedSortData = data);
+      component.sortChange.subscribe((data: any) => (emittedSortData = data));
 
-      const sortableHeader = fixture.debugElement.query(By.css('.tableng-sortable'));
-      
+      const sortableHeader = fixture.debugElement.query(
+        By.css('.tableng-sortable')
+      );
+
       // Simulate Enter key press
-      sortableHeader.triggerEventHandler('keydown', { key: 'Enter', preventDefault: () => { /* prevent default */ } });
-      
+      sortableHeader.triggerEventHandler('keydown', {
+        key: 'Enter',
+        preventDefault: () => {
+          /* prevent default */
+        },
+      });
+
       expect(emittedSortData).toBeDefined();
     });
   });
@@ -342,30 +417,35 @@ describe('TableHeaderComponent', () => {
   describe('Error Handling', () => {
     it('should handle empty columns array gracefully', () => {
       component.columns = [];
-      
+
       expect(() => {
         fixture.detectChanges();
       }).not.toThrow();
 
-      const headerCells = fixture.debugElement.queryAll(By.css('.tableng-header-cell'));
+      const headerCells = fixture.debugElement.queryAll(
+        By.css('.tableng-header-cell')
+      );
       expect(headerCells.length).toBe(0);
     });
 
     it('should handle null config gracefully', () => {
       component.config = null as any;
-      
+
       expect(() => {
         fixture.detectChanges();
       }).not.toThrow();
     });
 
     it('should handle columns without width specified', () => {
-      const columnsWithoutWidth = mockColumns.map(col => ({ ...col, width: undefined }));
+      const columnsWithoutWidth = mockColumns.map(col => ({
+        ...col,
+        width: undefined,
+      }));
       component.columns = columnsWithoutWidth;
-      
+
       expect(() => {
         fixture.detectChanges();
       }).not.toThrow();
     });
   });
-}); 
+});

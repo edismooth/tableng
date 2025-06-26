@@ -4,9 +4,9 @@ describe('CellEditConfig Interface', () => {
   describe('Type Structure', () => {
     it('should allow a minimal valid edit config', () => {
       const config: CellEditConfig = {
-        type: 'text'
+        type: 'text',
       };
-      
+
       expect(config.type).toBe('text');
     });
 
@@ -16,25 +16,30 @@ describe('CellEditConfig Interface', () => {
         required: true,
         placeholder: 'Select an option',
         options: ['Option 1', 'Option 2', 'Option 3'],
-        validators: [{
-          type: 'minLength',
-          validator: (value: string) => value.length >= 1,
-          message: 'Minimum length 1 required.'
-        }, {
-          type: 'maxLength',
-          validator: (value: string) => value.length <= 100,
-          message: 'Maximum length 100 exceeded.'
-        }, {
-          type: 'pattern',
-          validator: (value: string) => /^[A-Za-z]+$/.test(value),
-          message: 'Only alphabets allowed.'
-        }, {
-          type: 'custom',
-          validator: (value: unknown) => value !== null,
-          message: 'Value cannot be null.'
-        }],
+        validators: [
+          {
+            type: 'minLength',
+            validator: (value: string) => value.length >= 1,
+            message: 'Minimum length 1 required.',
+          },
+          {
+            type: 'maxLength',
+            validator: (value: string) => value.length <= 100,
+            message: 'Maximum length 100 exceeded.',
+          },
+          {
+            type: 'pattern',
+            validator: (value: string) => /^[A-Za-z]+$/.test(value),
+            message: 'Only alphabets allowed.',
+          },
+          {
+            type: 'custom',
+            validator: (value: unknown) => value !== null,
+            message: 'Value cannot be null.',
+          },
+        ],
         disabled: false,
-        readonly: false
+        readonly: false,
       };
 
       expect(config.type).toBe('select');
@@ -70,7 +75,7 @@ describe('CellEditConfig Interface', () => {
     it('should allow string array options', () => {
       const config: CellEditConfig = {
         type: 'select',
-        options: ['Red', 'Green', 'Blue']
+        options: ['Red', 'Green', 'Blue'],
       };
 
       expect(config.options).toEqual(['Red', 'Green', 'Blue']);
@@ -81,8 +86,8 @@ describe('CellEditConfig Interface', () => {
         type: 'select',
         options: [
           { value: 'red', label: 'Red Color' },
-          { value: 'green', label: 'Green Color' }
-        ]
+          { value: 'green', label: 'Green Color' },
+        ],
       };
 
       expect(config.options!.length).toBe(2);
@@ -94,15 +99,18 @@ describe('CellEditConfig Interface', () => {
     it('should allow partial validation rules', () => {
       const config: CellEditConfig = {
         type: 'text',
-        validators: [{
-          type: 'minLength',
-          validator: (value: string) => value.length >= 5,
-          message: 'Minimum length 5 required.'
-        }, {
-          type: 'required',
-          validator: (value: string) => !!value,
-          message: 'Value is required.'
-        }]
+        validators: [
+          {
+            type: 'minLength',
+            validator: (value: string) => value.length >= 5,
+            message: 'Minimum length 5 required.',
+          },
+          {
+            type: 'required',
+            validator: (value: string) => !!value,
+            message: 'Value is required.',
+          },
+        ],
       };
 
       expect(config.validators?.length).toBe(2);
@@ -117,11 +125,13 @@ describe('CellEditConfig Interface', () => {
 
       const config: CellEditConfig = {
         type: 'text',
-        validators: [{
-          type: 'custom',
-          validator: customValidator,
-          message: 'Custom validation failed.'
-        }]
+        validators: [
+          {
+            type: 'custom',
+            validator: customValidator,
+            message: 'Custom validation failed.',
+          },
+        ],
       };
 
       expect(config.validators?.[0].validator).toBe(customValidator);
@@ -131,14 +141,16 @@ describe('CellEditConfig Interface', () => {
 
     it('should allow regex pattern validation', () => {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      
+
       const config: CellEditConfig = {
         type: 'text',
-        validators: [{
-          type: 'pattern',
-          validator: (value: string) => emailPattern.test(value),
-          message: 'Invalid email format.'
-        }]
+        validators: [
+          {
+            type: 'pattern',
+            validator: (value: string) => emailPattern.test(value),
+            message: 'Invalid email format.',
+          },
+        ],
       };
 
       expect(config.validators?.[0].type).toBe('pattern');
@@ -149,7 +161,7 @@ describe('CellEditConfig Interface', () => {
   describe('Required Properties', () => {
     it('should require type property', () => {
       const config: CellEditConfig = {
-        type: 'text'
+        type: 'text',
       };
 
       expect(config.type).toBeDefined();
@@ -160,10 +172,16 @@ describe('CellEditConfig Interface', () => {
   describe('Validation Logic', () => {
     it('should validate select type requires options', () => {
       const isValidSelectConfig = (config: CellEditConfig): boolean => {
-        return config.type !== 'select' || Boolean(config.options && config.options.length > 0);
+        return (
+          config.type !== 'select' ||
+          Boolean(config.options && config.options.length > 0)
+        );
       };
 
-      const validSelect: CellEditConfig = { type: 'select', options: ['A', 'B'] };
+      const validSelect: CellEditConfig = {
+        type: 'select',
+        options: ['A', 'B'],
+      };
       const invalidSelect: CellEditConfig = { type: 'select' };
       const textConfig: CellEditConfig = { type: 'text' };
 
@@ -184,17 +202,17 @@ describe('CellEditConfig Interface', () => {
       const validConfig: CellEditConfig = {
         type: 'text',
         minLength: 1,
-        maxLength: 10
+        maxLength: 10,
       };
-      
+
       const invalidConfig: CellEditConfig = {
         type: 'text',
         minLength: 10,
-        maxLength: 5
+        maxLength: 5,
       };
 
       expect(isValidLengthConstraints(validConfig)).toBe(true);
       expect(isValidLengthConstraints(invalidConfig)).toBe(false);
     });
   });
-}); 
+});

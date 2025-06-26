@@ -7,9 +7,9 @@ describe('ColumnDefinition Interface', () => {
       const column: ColumnDefinition = {
         key: 'id',
         title: 'ID',
-        type: 'text'
+        type: 'text',
       };
-      
+
       expect(column.key).toBe('id');
       expect(column.title).toBe('ID');
       expect(column.type).toBe('text');
@@ -18,7 +18,7 @@ describe('ColumnDefinition Interface', () => {
     it('should allow a complete column definition with all optional properties', () => {
       const editConfig: CellEditConfig = {
         type: 'text',
-        required: true
+        required: true,
       };
 
       const column: ColumnDefinition = {
@@ -40,7 +40,7 @@ describe('ColumnDefinition Interface', () => {
         editable: true,
         editConfig: editConfig,
         formatter: (value: any) => String(value),
-        validator: (value: any) => value != null
+        validator: (value: any) => value != null,
       };
 
       expect(column.key).toBe('name');
@@ -68,7 +68,7 @@ describe('ColumnDefinition Interface', () => {
       const column: ColumnDefinition = {
         key: 'required-key',
         title: 'Title',
-        type: 'text'
+        type: 'text',
       };
 
       expect(column.key).toBeDefined();
@@ -79,7 +79,7 @@ describe('ColumnDefinition Interface', () => {
       const column: ColumnDefinition = {
         key: 'test',
         title: 'Required Title',
-        type: 'text'
+        type: 'text',
       };
 
       expect(column.title).toBeDefined();
@@ -90,7 +90,7 @@ describe('ColumnDefinition Interface', () => {
       const column: ColumnDefinition = {
         key: 'test',
         title: 'Title',
-        type: 'number'
+        type: 'number',
       };
 
       expect(column.type).toBeDefined();
@@ -100,12 +100,36 @@ describe('ColumnDefinition Interface', () => {
 
   describe('Column Types', () => {
     it('should support all column types', () => {
-      const textColumn: ColumnDefinition = { key: 'text', title: 'Text', type: 'text' };
-      const numberColumn: ColumnDefinition = { key: 'num', title: 'Number', type: 'number' };
-      const dateColumn: ColumnDefinition = { key: 'date', title: 'Date', type: 'date' };
-      const booleanColumn: ColumnDefinition = { key: 'bool', title: 'Boolean', type: 'boolean' };
-      const selectColumn: ColumnDefinition = { key: 'select', title: 'Select', type: 'select' };
-      const customColumn: ColumnDefinition = { key: 'custom', title: 'Custom', type: 'custom' };
+      const textColumn: ColumnDefinition = {
+        key: 'text',
+        title: 'Text',
+        type: 'text',
+      };
+      const numberColumn: ColumnDefinition = {
+        key: 'num',
+        title: 'Number',
+        type: 'number',
+      };
+      const dateColumn: ColumnDefinition = {
+        key: 'date',
+        title: 'Date',
+        type: 'date',
+      };
+      const booleanColumn: ColumnDefinition = {
+        key: 'bool',
+        title: 'Boolean',
+        type: 'boolean',
+      };
+      const selectColumn: ColumnDefinition = {
+        key: 'select',
+        title: 'Select',
+        type: 'select',
+      };
+      const customColumn: ColumnDefinition = {
+        key: 'custom',
+        title: 'Custom',
+        type: 'custom',
+      };
 
       expect(textColumn.type).toBe('text');
       expect(numberColumn.type).toBe('number');
@@ -122,21 +146,21 @@ describe('ColumnDefinition Interface', () => {
         key: 'asc',
         title: 'Ascending',
         type: 'text',
-        sortDirection: 'asc'
+        sortDirection: 'asc',
       };
 
       const descColumn: ColumnDefinition = {
         key: 'desc',
         title: 'Descending',
         type: 'text',
-        sortDirection: 'desc'
+        sortDirection: 'desc',
       };
 
       const noneColumn: ColumnDefinition = {
         key: 'none',
         title: 'No Sort',
         type: 'text',
-        sortDirection: 'none'
+        sortDirection: 'none',
       };
 
       expect(ascColumn.sortDirection).toBe('asc');
@@ -155,7 +179,7 @@ describe('ColumnDefinition Interface', () => {
         key: 'formatted',
         title: 'Formatted',
         type: 'text',
-        formatter: formatter
+        formatter: formatter,
       };
 
       expect(column.formatter).toBe(formatter);
@@ -171,7 +195,7 @@ describe('ColumnDefinition Interface', () => {
         key: 'validated',
         title: 'Validated',
         type: 'text',
-        validator: validator
+        validator: validator,
       };
 
       expect(column.validator).toBe(validator);
@@ -192,20 +216,28 @@ describe('ColumnDefinition Interface', () => {
     });
 
     it('should validate width constraints', () => {
-      const isValidWidthConstraints = (column: Partial<ColumnDefinition>): boolean => {
+      const isValidWidthConstraints = (
+        column: Partial<ColumnDefinition>
+      ): boolean => {
         const { width, minWidth, maxWidth } = column;
-        
+
         if (minWidth && width && width < minWidth) return false;
         if (maxWidth && width && width > maxWidth) return false;
         if (minWidth && maxWidth && minWidth > maxWidth) return false;
-        
+
         return true;
       };
 
-      expect(isValidWidthConstraints({ width: 150, minWidth: 100, maxWidth: 200 })).toBe(true);
+      expect(
+        isValidWidthConstraints({ width: 150, minWidth: 100, maxWidth: 200 })
+      ).toBe(true);
       expect(isValidWidthConstraints({ width: 50, minWidth: 100 })).toBe(false);
-      expect(isValidWidthConstraints({ width: 250, maxWidth: 200 })).toBe(false);
-      expect(isValidWidthConstraints({ minWidth: 200, maxWidth: 100 })).toBe(false);
+      expect(isValidWidthConstraints({ width: 250, maxWidth: 200 })).toBe(
+        false
+      );
+      expect(isValidWidthConstraints({ minWidth: 200, maxWidth: 100 })).toBe(
+        false
+      );
     });
   });
-}); 
+});

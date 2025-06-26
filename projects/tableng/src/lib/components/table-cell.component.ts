@@ -1,5 +1,21 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { FormControl, ValidatorFn, Validators, AbstractControl } from '@angular/forms';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  ChangeDetectorRef,
+} from '@angular/core';
+import {
+  FormControl,
+  ValidatorFn,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 import { ColumnDefinition } from '../interfaces/column-definition.interface';
 import { CellEditConfig } from '../interfaces/cell-edit-config.interface';
 import { ValidatorConfig } from '../interfaces/validator-config.interface';
@@ -7,7 +23,7 @@ import { ValidatorConfig } from '../interfaces/validator-config.interface';
 @Component({
   selector: 'tng-table-cell',
   templateUrl: './table-cell.component.html',
-  styleUrls: ['./table-cell.component.scss']
+  styleUrls: ['./table-cell.component.scss'],
 })
 export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() column!: ColumnDefinition;
@@ -85,7 +101,9 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
         case 'boolean':
           return this.value ? 'Yes' : 'No';
         case 'number':
-          return typeof this.value === 'number' ? this.value.toString() : String(this.value);
+          return typeof this.value === 'number'
+            ? this.value.toString()
+            : String(this.value);
         case 'date':
           if (this.value instanceof Date) {
             return this.value.toLocaleDateString();
@@ -105,7 +123,11 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Edit mode management
   startEdit(): void {
-    if (!this.editable || this.editConfig?.readonly || this.editConfig?.disabled) {
+    if (
+      !this.editable ||
+      this.editConfig?.readonly ||
+      this.editConfig?.disabled
+    ) {
       return;
     }
 
@@ -116,7 +138,7 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
     this.editStart.emit({
       column: this.column.key,
       rowIndex: this.rowIndex,
-      value: this.value
+      value: this.value,
     });
 
     // Focus input after view update
@@ -140,13 +162,13 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
       column: this.column.key,
       rowIndex: this.rowIndex,
       oldValue: oldValue,
-      newValue: this.value
+      newValue: this.value,
     });
 
     this.editEnd.emit({
       column: this.column.key,
       rowIndex: this.rowIndex,
-      saved: true
+      saved: true,
     });
   }
 
@@ -156,13 +178,13 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.editCancel.emit({
       column: this.column.key,
-      rowIndex: this.rowIndex
+      rowIndex: this.rowIndex,
     });
 
     this.editEnd.emit({
       column: this.column.key,
       rowIndex: this.rowIndex,
-      saved: false
+      saved: false,
     });
   }
 
@@ -184,7 +206,9 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.editConfig?.validators) {
       this.editConfig.validators.forEach((validatorConfig: ValidatorConfig) => {
         validators.push((control: AbstractControl) => {
-          return validatorConfig.validator(control.value) ? null : { [validatorConfig.type]: true };
+          return validatorConfig.validator(control.value)
+            ? null
+            : { [validatorConfig.type]: true };
         });
       });
     }
@@ -210,7 +234,7 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
     if (errors['pattern']) {
       return 'Invalid format';
     }
-    
+
     // Check for custom validator errors
     if (this.editConfig?.validators) {
       for (const validator of this.editConfig.validators) {
@@ -219,7 +243,7 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     }
-    
+
     return 'Invalid value';
   }
 
@@ -263,9 +287,12 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   // Date input helpers
   getDateInputValue(): string {
     if (!this.cellControl.value) return '';
-    
+
     try {
-      const date = this.cellControl.value instanceof Date ? this.cellControl.value : new Date(String(this.cellControl.value));
+      const date =
+        this.cellControl.value instanceof Date
+          ? this.cellControl.value
+          : new Date(String(this.cellControl.value));
       return date.toISOString().split('T')[0];
     } catch {
       return '';
@@ -325,7 +352,12 @@ export class TableCellComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onMouseEnter(): void {
-    if (this.editable && !this.isEditing && !this.editConfig?.readonly && !this.editConfig?.disabled) {
+    if (
+      this.editable &&
+      !this.isEditing &&
+      !this.editConfig?.readonly &&
+      !this.editConfig?.disabled
+    ) {
       this.showEditIndicator = true;
     }
   }

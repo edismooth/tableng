@@ -1,48 +1,57 @@
 <div class="tableng-header" [ngClass]="getHeaderClasses()">
   <div class="tableng-header-row">
-    <div *ngFor="let column of columns; let i = index" 
-         class="tableng-header-cell"
-         [ngClass]="getHeaderCellClasses(column)"
-         [style.width.px]="column.width"
-         [draggable]="config?.reorderable"
-         (click)="onColumnClick(column)"
-         (keydown)="onKeyDown($event, column)"
-         (dragstart)="onDragStart($event, i)"
-         (dragend)="onDragEnd($event)"
-         [attr.role]="column.sortable ? 'columnheader' : null"
-         [attr.aria-sort]="getAriaSort(column)"
-         [attr.tabindex]="column.sortable ? '0' : null">
-      
+    <div
+      *ngFor="let column of columns; let i = index"
+      class="tableng-header-cell"
+      [ngClass]="getHeaderCellClasses(column)"
+      [style.width.px]="column.width"
+      [draggable]="config?.reorderable"
+      (click)="onColumnClick(column)"
+      (keydown)="onKeyDown($event, column)"
+      (dragstart)="onDragStart($event, i)"
+      (dragend)="onDragEnd($event)"
+      [attr.role]="column.sortable ? 'columnheader' : null"
+      [attr.aria-sort]="getAriaSort(column)"
+      [attr.tabindex]="column.sortable ? '0' : null"
+    >
       <!-- Column Title and Sort Icon -->
       <div class="tableng-header-content">
         <span class="tableng-header-cell-title">{{ column.title }}</span>
-        
+
         <!-- Sort Icon -->
-        <span *ngIf="column.sortable && config?.sorting" 
-              class="tableng-sort-icon"
-              [ngClass]="getSortIconClasses(column)">
+        <span
+          *ngIf="column.sortable && config?.sorting"
+          class="tableng-sort-icon"
+          [ngClass]="getSortIconClasses(column)"
+        >
           {{ getSortIcon(column) }}
         </span>
       </div>
 
       <!-- Filter Input -->
-      <div *ngIf="column.filterable && config?.filtering" 
-           class="tableng-filter-container">
-        <input type="text" 
-               class="tableng-filter-input"
-               [placeholder]="'Filter ' + column.title"
-               [value]="getFilterValue(column.key)"
-               [attr.aria-label]="'Filter by ' + column.title"
-               (input)="onFilterChange($event, column)"
-               (click)="$event.stopPropagation()">
+      <div
+        *ngIf="column.filterable && config?.filtering"
+        class="tableng-filter-container"
+      >
+        <input
+          type="text"
+          class="tableng-filter-input"
+          [placeholder]="'Filter ' + column.title"
+          [value]="getFilterValue(column.key)"
+          [attr.aria-label]="'Filter by ' + column.title"
+          (input)="onFilterChange($event, column)"
+          (click)="$event.stopPropagation()"
+        />
       </div>
 
       <!-- Resize Handle -->
-      <div *ngIf="column.resizable && config?.resizable" 
-           class="tableng-resize-handle"
-           (mousedown)="onResizeStart($event, column)">
+      <div
+        *ngIf="column.resizable && config?.resizable"
+        class="tableng-resize-handle"
+        (mousedown)="onResizeStart($event, column)"
+      >
         <span class="tableng-resize-line"></span>
       </div>
     </div>
   </div>
-</div> 
+</div>

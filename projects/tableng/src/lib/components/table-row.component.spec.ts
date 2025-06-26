@@ -15,7 +15,13 @@ describe('TableRowComponent', () => {
     { key: 'id', title: 'ID', type: 'number', width: 80 },
     { key: 'name', title: 'Name', type: 'text', width: 200, editable: true },
     { key: 'email', title: 'Email', type: 'text', width: 250, editable: true },
-    { key: 'active', title: 'Active', type: 'boolean', width: 100, editable: true }
+    {
+      key: 'active',
+      title: 'Active',
+      type: 'boolean',
+      width: 100,
+      editable: true,
+    },
   ];
 
   const mockRowData: TableRow<any> = {
@@ -23,27 +29,27 @@ describe('TableRowComponent', () => {
       id: 1,
       name: 'John Doe',
       email: 'john@example.com',
-      active: true
+      active: true,
     },
     level: 0,
-    expanded: false
+    expanded: false,
   };
 
   const mockEditConfigs: Record<string, CellEditConfig> = {
     name: { type: 'text', required: true },
     email: { type: 'text', required: true },
-    active: { type: 'checkbox' }
+    active: { type: 'checkbox' },
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [TableRowComponent, TableCellComponent],
-      imports: [FormsModule, ReactiveFormsModule]
+      imports: [FormsModule, ReactiveFormsModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TableRowComponent);
     component = fixture.componentInstance;
-    
+
     // Set default inputs
     component.columns = mockColumns;
     component.rowData = mockRowData;
@@ -93,17 +99,22 @@ describe('TableRowComponent', () => {
     });
 
     it('should render correct number of cells', () => {
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
       expect(cellElements.length).toBe(mockColumns.length);
     });
 
     it('should pass correct data to each cell', () => {
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
-      
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
+
       cellElements.forEach((cellElement, index) => {
-        const cellComponent = cellElement.componentInstance as TableCellComponent;
+        const cellComponent =
+          cellElement.componentInstance as TableCellComponent;
         const column = mockColumns[index];
-        
+
         expect(cellComponent.column).toEqual(column);
         expect(cellComponent.value).toBe(mockRowData.data[column.key]);
         expect(cellComponent.rowIndex).toBe(0);
@@ -111,17 +122,22 @@ describe('TableRowComponent', () => {
     });
 
     it('should pass edit configs to editable cells', () => {
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
-      
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
+
       const nameCell = cellElements[1].componentInstance as TableCellComponent;
       expect(nameCell.editConfig).toEqual(mockEditConfigs['name']);
-      
-      const activeCell = cellElements[3].componentInstance as TableCellComponent;
+
+      const activeCell = cellElements[3]
+        .componentInstance as TableCellComponent;
       expect(activeCell.editConfig).toEqual(mockEditConfigs['active']);
     });
 
     it('should render selection checkbox when selectable', () => {
-      const checkbox = fixture.debugElement.query(By.css('.tableng-row-selector input[type="checkbox"]'));
+      const checkbox = fixture.debugElement.query(
+        By.css('.tableng-row-selector input[type="checkbox"]')
+      );
       expect(checkbox).toBeTruthy();
     });
 
@@ -129,13 +145,17 @@ describe('TableRowComponent', () => {
       component.selectable = false;
       fixture.detectChanges();
 
-      const checkbox = fixture.debugElement.query(By.css('.tableng-row-selector'));
+      const checkbox = fixture.debugElement.query(
+        By.css('.tableng-row-selector')
+      );
       expect(checkbox).toBeFalsy();
     });
 
     it('should apply row styling classes', () => {
       const rowElement = fixture.debugElement.query(By.css('.tableng-row'));
-      expect(rowElement.nativeElement.classList).toContain('tableng-row-selectable');
+      expect(rowElement.nativeElement.classList).toContain(
+        'tableng-row-selectable'
+      );
     });
 
     it('should apply even/odd row styling', () => {
@@ -157,8 +177,10 @@ describe('TableRowComponent', () => {
     });
 
     it('should toggle selection on checkbox click', () => {
-      const checkbox = fixture.debugElement.query(By.css('.tableng-row-selector input'));
-      
+      const checkbox = fixture.debugElement.query(
+        By.css('.tableng-row-selector input')
+      );
+
       checkbox.triggerEventHandler('change', { target: { checked: true } });
       expect(component.selected).toBe(true);
 
@@ -168,15 +190,17 @@ describe('TableRowComponent', () => {
 
     it('should emit rowSelect event on selection change', () => {
       let emittedEvent: any;
-      component.rowSelect.subscribe((event: any) => emittedEvent = event);
+      component.rowSelect.subscribe((event: any) => (emittedEvent = event));
 
-      const checkbox = fixture.debugElement.query(By.css('.tableng-row-selector input'));
+      const checkbox = fixture.debugElement.query(
+        By.css('.tableng-row-selector input')
+      );
       checkbox.triggerEventHandler('change', { target: { checked: true } });
 
       expect(emittedEvent).toEqual({
         rowIndex: 0,
         rowData: mockRowData,
-        selected: true
+        selected: true,
       });
     });
 
@@ -184,7 +208,9 @@ describe('TableRowComponent', () => {
       component.selected = true;
       fixture.detectChanges();
 
-      const checkbox = fixture.debugElement.query(By.css('.tableng-row-selector input'));
+      const checkbox = fixture.debugElement.query(
+        By.css('.tableng-row-selector input')
+      );
       expect(checkbox.nativeElement.checked).toBe(true);
     });
 
@@ -193,7 +219,9 @@ describe('TableRowComponent', () => {
       fixture.detectChanges();
 
       const rowElement = fixture.debugElement.query(By.css('.tableng-row'));
-      expect(rowElement.nativeElement.classList).toContain('tableng-row-selected');
+      expect(rowElement.nativeElement.classList).toContain(
+        'tableng-row-selected'
+      );
     });
   });
 
@@ -204,7 +232,7 @@ describe('TableRowComponent', () => {
 
     it('should emit rowClick event on row click', () => {
       let emittedEvent: any;
-      component.rowClick.subscribe((event: any) => emittedEvent = event);
+      component.rowClick.subscribe((event: any) => (emittedEvent = event));
 
       const rowElement = fixture.debugElement.query(By.css('.tableng-row'));
       rowElement.triggerEventHandler('click', new MouseEvent('click'));
@@ -216,7 +244,7 @@ describe('TableRowComponent', () => {
 
     it('should handle mouse enter event', () => {
       let emittedEvent: any;
-      component.rowHover.subscribe((event: any) => emittedEvent = event);
+      component.rowHover.subscribe((event: any) => (emittedEvent = event));
 
       const rowElement = fixture.debugElement.query(By.css('.tableng-row'));
       rowElement.triggerEventHandler('mouseenter', null);
@@ -225,13 +253,13 @@ describe('TableRowComponent', () => {
       expect(emittedEvent).toEqual({
         rowIndex: 0,
         rowData: mockRowData,
-        hovering: true
+        hovering: true,
       });
     });
 
     it('should handle mouse leave event', () => {
       let emittedEvent: any;
-      component.rowHover.subscribe((event: any) => emittedEvent = event);
+      component.rowHover.subscribe((event: any) => (emittedEvent = event));
 
       component.hovering = true;
       const rowElement = fixture.debugElement.query(By.css('.tableng-row'));
@@ -241,7 +269,7 @@ describe('TableRowComponent', () => {
       expect(emittedEvent).toEqual({
         rowIndex: 0,
         rowData: mockRowData,
-        hovering: false
+        hovering: false,
       });
     });
 
@@ -260,7 +288,7 @@ describe('TableRowComponent', () => {
 
     it('should handle Enter key press', () => {
       let emittedEvent: any;
-      component.rowClick.subscribe((event: any) => emittedEvent = event);
+      component.rowClick.subscribe((event: any) => (emittedEvent = event));
 
       const rowElement = fixture.debugElement.query(By.css('.tableng-row'));
       const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
@@ -273,7 +301,7 @@ describe('TableRowComponent', () => {
 
     it('should handle Space key press for selection', () => {
       let emittedEvent: any;
-      component.rowSelect.subscribe((event: any) => emittedEvent = event);
+      component.rowSelect.subscribe((event: any) => (emittedEvent = event));
 
       const rowElement = fixture.debugElement.query(By.css('.tableng-row'));
       const spaceEvent = new KeyboardEvent('keydown', { key: ' ' });
@@ -283,7 +311,7 @@ describe('TableRowComponent', () => {
       expect(emittedEvent).toEqual({
         rowIndex: 0,
         rowData: mockRowData,
-        selected: true
+        selected: true,
       });
     });
   });
@@ -294,13 +322,15 @@ describe('TableRowComponent', () => {
     });
 
     it('should handle cell edit start events', () => {
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
       const nameCell = cellElements[1].componentInstance as TableCellComponent;
 
       nameCell.editStart.emit({
         column: 'name',
         rowIndex: 0,
-        value: 'John Doe'
+        value: 'John Doe',
       });
 
       expect(component.hasEditingCell).toBe(true);
@@ -308,14 +338,16 @@ describe('TableRowComponent', () => {
 
     it('should handle cell edit end events', () => {
       component.hasEditingCell = true;
-      
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
+
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
       const nameCell = cellElements[1].componentInstance as TableCellComponent;
 
       nameCell.editEnd.emit({
         column: 'name',
         rowIndex: 0,
-        saved: true
+        saved: true,
       });
 
       expect(component.hasEditingCell).toBe(false);
@@ -323,16 +355,20 @@ describe('TableRowComponent', () => {
 
     it('should emit cellValueChange when cell value changes', () => {
       let emittedEvent: any;
-      component.cellValueChange.subscribe((event: any) => emittedEvent = event);
+      component.cellValueChange.subscribe(
+        (event: any) => (emittedEvent = event)
+      );
 
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
       const nameCell = cellElements[1].componentInstance as TableCellComponent;
 
       nameCell.valueChange.emit({
         column: 'name',
         rowIndex: 0,
         oldValue: 'John Doe',
-        newValue: 'Jane Doe'
+        newValue: 'Jane Doe',
       });
 
       expect(emittedEvent).toEqual({
@@ -340,19 +376,21 @@ describe('TableRowComponent', () => {
         rowData: mockRowData,
         column: 'name',
         oldValue: 'John Doe',
-        newValue: 'Jane Doe'
+        newValue: 'Jane Doe',
       });
     });
 
     it('should update local row data when cell value changes', () => {
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
       const nameCell = cellElements[1].componentInstance as TableCellComponent;
 
       nameCell.valueChange.emit({
         column: 'name',
         rowIndex: 0,
         oldValue: 'John Doe',
-        newValue: 'Jane Doe'
+        newValue: 'Jane Doe',
       });
 
       expect(component.rowData?.data?.['name']).toBe('Jane Doe');
@@ -363,17 +401,26 @@ describe('TableRowComponent', () => {
       fixture.detectChanges();
 
       const rowElement = fixture.debugElement.query(By.css('.tableng-row'));
-      expect(rowElement.nativeElement.classList).toContain('tableng-row-editing');
+      expect(rowElement.nativeElement.classList).toContain(
+        'tableng-row-editing'
+      );
     });
   });
 
   describe('Dynamic Column Changes', () => {
     it('should handle column order changes', () => {
-      const reorderedColumns = [mockColumns[1], mockColumns[0], mockColumns[2], mockColumns[3]];
+      const reorderedColumns = [
+        mockColumns[1],
+        mockColumns[0],
+        mockColumns[2],
+        mockColumns[3],
+      ];
       component.columns = reorderedColumns;
       fixture.detectChanges();
 
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
       expect(cellElements[0].componentInstance.column.key).toBe('name');
       expect(cellElements[1].componentInstance.column.key).toBe('id');
     });
@@ -383,7 +430,9 @@ describe('TableRowComponent', () => {
       component.columns = visibleColumns;
       fixture.detectChanges();
 
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
       expect(cellElements.length).toBe(3);
     });
 
@@ -392,16 +441,18 @@ describe('TableRowComponent', () => {
         key: 'created',
         title: 'Created',
         type: 'date',
-        width: 150
+        width: 150,
       };
       component.columns = [...mockColumns, newColumn];
       component.rowData = {
         ...mockRowData,
-        data: { ...mockRowData.data, created: new Date() }
+        data: { ...mockRowData.data, created: new Date() },
       };
       fixture.detectChanges();
 
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
       expect(cellElements.length).toBe(5);
     });
   });
@@ -414,7 +465,9 @@ describe('TableRowComponent', () => {
     it('should have proper ARIA attributes', () => {
       const rowElement = fixture.debugElement.query(By.css('.tableng-row'));
       expect(rowElement.nativeElement.getAttribute('role')).toBe('row');
-      expect(rowElement.nativeElement.getAttribute('aria-selected')).toBe('false');
+      expect(rowElement.nativeElement.getAttribute('aria-selected')).toBe(
+        'false'
+      );
     });
 
     it('should update aria-selected when selected', () => {
@@ -422,24 +475,32 @@ describe('TableRowComponent', () => {
       fixture.detectChanges();
 
       const rowElement = fixture.debugElement.query(By.css('.tableng-row'));
-      expect(rowElement.nativeElement.getAttribute('aria-selected')).toBe('true');
+      expect(rowElement.nativeElement.getAttribute('aria-selected')).toBe(
+        'true'
+      );
     });
 
     it('should have aria-label for selection checkbox', () => {
-      const checkbox = fixture.debugElement.query(By.css('.tableng-row-selector input'));
-      expect(checkbox.nativeElement.getAttribute('aria-label')).toContain('Select row');
+      const checkbox = fixture.debugElement.query(
+        By.css('.tableng-row-selector input')
+      );
+      expect(checkbox.nativeElement.getAttribute('aria-label')).toContain(
+        'Select row'
+      );
     });
 
     it('should support screen reader announcements', () => {
       const rowElement = fixture.debugElement.query(By.css('.tableng-row'));
-      expect(rowElement.nativeElement.getAttribute('aria-describedby')).toBeTruthy();
+      expect(
+        rowElement.nativeElement.getAttribute('aria-describedby')
+      ).toBeTruthy();
     });
   });
 
   describe('Error Handling', () => {
     it('should handle null row data gracefully', () => {
       component.rowData = null as any;
-      
+
       expect(() => {
         fixture.detectChanges();
       }).not.toThrow();
@@ -447,7 +508,7 @@ describe('TableRowComponent', () => {
 
     it('should handle undefined row data gracefully', () => {
       component.rowData = null as any;
-      
+
       expect(() => {
         fixture.detectChanges();
       }).not.toThrow();
@@ -455,18 +516,20 @@ describe('TableRowComponent', () => {
 
     it('should handle empty columns array', () => {
       component.columns = [];
-      
+
       expect(() => {
         fixture.detectChanges();
       }).not.toThrow();
-      
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
+
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
       expect(cellElements.length).toBe(0);
     });
 
     it('should handle missing edit configs', () => {
       component.editConfigs = null;
-      
+
       expect(() => {
         fixture.detectChanges();
       }).not.toThrow();
@@ -474,12 +537,14 @@ describe('TableRowComponent', () => {
 
     it('should handle row data with missing properties', () => {
       component.rowData = { data: { id: 1 }, level: 0, expanded: false }; // Missing name, email, active
-      
+
       expect(() => {
         fixture.detectChanges();
       }).not.toThrow();
-      
-      const cellElements = fixture.debugElement.queryAll(By.directive(TableCellComponent));
+
+      const cellElements = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
       expect(cellElements[1].componentInstance.value).toBeUndefined();
     });
   });
@@ -501,12 +566,16 @@ describe('TableRowComponent', () => {
 
     it('should not recreate cells unnecessarily', () => {
       fixture.detectChanges();
-      const initialCells = fixture.debugElement.queryAll(By.directive(TableCellComponent));
-      
+      const initialCells = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
+
       component.hovering = true;
       fixture.detectChanges();
-      
-      const afterHoverCells = fixture.debugElement.queryAll(By.directive(TableCellComponent));
+
+      const afterHoverCells = fixture.debugElement.queryAll(
+        By.directive(TableCellComponent)
+      );
       expect(afterHoverCells.length).toBe(initialCells.length);
     });
   });

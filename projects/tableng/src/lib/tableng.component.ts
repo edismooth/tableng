@@ -1,28 +1,35 @@
-import { 
-  Component, 
-  Input, 
-  Output, 
-  EventEmitter, 
-  OnInit, 
-  OnDestroy, 
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy,
   OnChanges,
   SimpleChanges,
   ChangeDetectionStrategy,
-  ChangeDetectorRef
+  ChangeDetectorRef,
 } from '@angular/core';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { TableConfig } from './interfaces/table-config.interface';
 import { ColumnDefinition } from './interfaces/column-definition.interface';
 import { CellEditConfig } from './interfaces/cell-edit-config.interface';
-import { TableStateService, SortState, FilterState } from './services/table-state.service';
-import { LocalStorageService, TableState } from './services/local-storage.service';
+import {
+  TableStateService,
+  SortState,
+  FilterState,
+} from './services/table-state.service';
+import {
+  LocalStorageService,
+  TableState,
+} from './services/local-storage.service';
 import { TableRow } from './interfaces/table-row.interface';
 
 @Component({
   selector: 'tng-tableng',
   templateUrl: './tableng.component.html',
   styleUrls: ['./tableng.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TablengComponent implements OnInit, OnDestroy, OnChanges {
   @Input() config?: TableConfig;
@@ -74,10 +81,7 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
 
     // Setup auto-save with debounce
     this.saveState$
-      .pipe(
-        debounceTime(500),
-        takeUntil(this.destroy$)
-      )
+      .pipe(debounceTime(500), takeUntil(this.destroy$))
       .subscribe(() => this.saveCurrentState());
   }
 
@@ -125,34 +129,41 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
 
   resetState(): void {
     if (!this.config) return;
-    
+
     // Reset service state
     this.stateService.initializeTable(this.config, this.data || []);
-    
+
     // Clear stored state
     this.storageService.removeTableState(this.config.tableId);
-    
+
     // Reset local state
     this.selectedRows = [];
     this.selectedRowsSet.clear();
-    
+
     this.cd.markForCheck();
     this.announce('Table state reset to defaults');
   }
 
   exportToCSV(): string {
     const headers = this.visibleColumns.map(col => col.title).join(',');
-    const rows = this.filteredData.map(row => 
-      this.visibleColumns.map(col => {
-        const value = row[col.key];
-        // Escape values containing commas or quotes
-        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-        return value ?? '';
-      }).join(',')
-    ).join('\n');
-    
+    const rows = this.filteredData
+      .map(row =>
+        this.visibleColumns
+          .map(col => {
+            const value = row[col.key];
+            // Escape values containing commas or quotes
+            if (
+              typeof value === 'string' &&
+              (value.includes(',') || value.includes('"'))
+            ) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value ?? '';
+          })
+          .join(',')
+      )
+      .join('\n');
+
     return `${headers}\n${rows}`;
   }
 
@@ -182,7 +193,7 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
     const newOrder = [...currentOrder];
     const [removed] = newOrder.splice(event.from, 1);
     newOrder.splice(event.to, 0, removed);
-    
+
     this.stateService.reorderColumns(newOrder);
     this.columnReorder.emit(event);
     this.saveState$.next();
@@ -204,7 +215,7 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
         this.selectedRowsSet.delete(event.rowData);
       }
     }
-    
+
     this.rowSelect.emit(event);
     this.cd.markForCheck();
     this.announce(`Row ${event.selected ? 'selected' : 'deselected'}`);
@@ -221,13 +232,13 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
     if (this.data && event.rowIndex >= 0 && event.rowIndex < this.data.length) {
       this.data[event.rowIndex][event.column] = event.newValue;
     }
-    
+
     this.cellEdit.emit(event);
     this.dataChange.emit({
       data: this.data,
-      change: event
+      change: event,
     });
-    
+
     this.announce(`Cell updated in ${event.column}`);
   }
 
@@ -263,17 +274,20 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
 
   private updateVisibleColumns(): void {
     if (!this.config) return;
-    
+
     const columnOrder = this.stateService.getColumnOrder();
     const columnWidths = this.stateService.getColumnWidths();
-    
+
     // Reorder and update column widths
     this.visibleColumns = columnOrder
       .map(key => this.config!.columns.find(col => col.key === key))
-      .filter((col): col is ColumnDefinition => col !== undefined && col.visible !== false)
+      .filter(
+        (col): col is ColumnDefinition =>
+          col !== undefined && col.visible !== false
+      )
       .map(col => ({
         ...col,
-        width: columnWidths[col.key] || col.width
+        width: columnWidths[col.key] || col.width,
       }));
   }
 
@@ -285,15 +299,15 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
 
   private saveCurrentState(): void {
     if (!this.config) return;
-    
+
     const state: Partial<TableState> = {
       config: this.config,
       columnOrder: this.stateService.getColumnOrder(),
       columnWidths: this.stateService.getColumnWidths(),
       sortState: this.stateService.getSortState(),
-      filterState: this.stateService.getFilterState()
+      filterState: this.stateService.getFilterState(),
     };
-    
+
     this.storageService.saveTableState(this.config.tableId, state);
   }
 
@@ -306,7 +320,7 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
   private announce(message: string): void {
     this.announcement = message;
     this.cd.markForCheck();
-    
+
     // Clear announcement after a delay
     setTimeout(() => {
       this.announcement = '';
@@ -316,11 +330,11 @@ export class TablengComponent implements OnInit, OnDestroy, OnChanges {
 
   getThemeName(): string | undefined {
     if (!this.config?.theme) return undefined;
-    
+
     if (typeof this.config.theme === 'string') {
       return this.config.theme;
     }
-    
+
     return this.config.theme.name;
   }
 

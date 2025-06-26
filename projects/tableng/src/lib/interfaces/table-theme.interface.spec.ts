@@ -1,12 +1,17 @@
-import { TableTheme, ThemeColors, ThemeTypography, ThemeSpacing } from './table-theme.interface';
+import {
+  TableTheme,
+  ThemeColors,
+  ThemeTypography,
+  ThemeSpacing,
+} from './table-theme.interface';
 
 describe('TableTheme Interface', () => {
   describe('Type Structure', () => {
     it('should allow a minimal valid theme', () => {
       const theme: TableTheme = {
-        name: 'minimal-theme'
+        name: 'minimal-theme',
       };
-      
+
       expect(theme.name).toBe('minimal-theme');
     });
 
@@ -23,7 +28,7 @@ describe('TableTheme Interface', () => {
         selected: '#e3f2fd',
         error: '#dc3545',
         warning: '#ffc107',
-        success: '#28a745'
+        success: '#28a745',
       };
 
       const typography: ThemeTypography = {
@@ -32,14 +37,14 @@ describe('TableTheme Interface', () => {
         fontWeight: '400',
         lineHeight: '1.5',
         headerFontSize: '16px',
-        headerFontWeight: '600'
+        headerFontWeight: '600',
       };
 
       const spacing: ThemeSpacing = {
         cellPadding: '8px 12px',
         headerPadding: '12px',
         rowHeight: '40px',
-        headerHeight: '48px'
+        headerHeight: '48px',
       };
 
       const theme: TableTheme = {
@@ -49,7 +54,7 @@ describe('TableTheme Interface', () => {
         spacing: spacing,
         borderRadius: '4px',
         borderWidth: '1px',
-        shadowLevel: 'medium'
+        shadowLevel: 'medium',
       };
 
       expect(theme.name).toBe('complete-theme');
@@ -66,7 +71,7 @@ describe('TableTheme Interface', () => {
     it('should allow partial color customization', () => {
       const colors: ThemeColors = {
         primary: '#custom-primary',
-        background: '#custom-bg'
+        background: '#custom-bg',
       };
 
       expect(colors.primary).toBe('#custom-primary');
@@ -87,7 +92,7 @@ describe('TableTheme Interface', () => {
         selected: '#9',
         error: '#10',
         warning: '#11',
-        success: '#12'
+        success: '#12',
       };
 
       expect(Object.keys(colors).length).toBe(12);
@@ -98,7 +103,7 @@ describe('TableTheme Interface', () => {
     it('should allow partial typography customization', () => {
       const typography: ThemeTypography = {
         fontFamily: 'Custom Font',
-        fontSize: '16px'
+        fontSize: '16px',
       };
 
       expect(typography.fontFamily).toBe('Custom Font');
@@ -111,7 +116,7 @@ describe('TableTheme Interface', () => {
     it('should allow partial spacing customization', () => {
       const spacing: ThemeSpacing = {
         cellPadding: '10px',
-        rowHeight: '50px'
+        rowHeight: '50px',
       };
 
       expect(spacing.cellPadding).toBe('10px');
@@ -124,22 +129,22 @@ describe('TableTheme Interface', () => {
     it('should support shadow level options', () => {
       const noneTheme: TableTheme = {
         name: 'none',
-        shadowLevel: 'none'
+        shadowLevel: 'none',
       };
 
       const lowTheme: TableTheme = {
         name: 'low',
-        shadowLevel: 'low'
+        shadowLevel: 'low',
       };
 
       const mediumTheme: TableTheme = {
         name: 'medium',
-        shadowLevel: 'medium'
+        shadowLevel: 'medium',
       };
 
       const highTheme: TableTheme = {
         name: 'high',
-        shadowLevel: 'high'
+        shadowLevel: 'high',
       };
 
       expect(noneTheme.shadowLevel).toBe('none');
@@ -165,10 +170,12 @@ describe('TableTheme Interface', () => {
         const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
         const rgbPattern = /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/;
         const namedColors = ['red', 'blue', 'green', 'white', 'black'];
-        
-        return hexPattern.test(color) || 
-               rgbPattern.test(color) || 
-               namedColors.includes(color.toLowerCase());
+
+        return (
+          hexPattern.test(color) ||
+          rgbPattern.test(color) ||
+          namedColors.includes(color.toLowerCase())
+        );
       };
 
       expect(isValidColor('#ff0000')).toBe(true);
@@ -178,4 +185,4 @@ describe('TableTheme Interface', () => {
       expect(isValidColor('invalid-color')).toBe(false);
     });
   });
-}); 
+});

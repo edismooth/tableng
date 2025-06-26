@@ -1,4 +1,9 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TableCellComponent } from './table-cell.component';
@@ -15,25 +20,25 @@ describe('TableCellComponent', () => {
     title: 'Name',
     type: 'text',
     width: 200,
-    editable: true
+    editable: true,
   };
 
   const mockEditConfig: CellEditConfig = {
     type: 'text',
     required: false,
     disabled: false,
-    readonly: false
+    readonly: false,
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [TableCellComponent],
-      imports: [FormsModule, ReactiveFormsModule]
+      imports: [FormsModule, ReactiveFormsModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TableCellComponent);
     component = fixture.componentInstance;
-    
+
     // Set default inputs
     component.column = mockColumn;
     component.value = 'Test Value';
@@ -75,18 +80,26 @@ describe('TableCellComponent', () => {
     });
 
     it('should render cell in display mode by default', () => {
-      const displayElement = fixture.debugElement.query(By.css('.tableng-cell-display'));
+      const displayElement = fixture.debugElement.query(
+        By.css('.tableng-cell-display')
+      );
       expect(displayElement).toBeTruthy();
     });
 
     it('should show formatted value in display mode', () => {
-      const displayElement = fixture.debugElement.query(By.css('.tableng-cell-content'));
-      expect(displayElement.nativeElement.textContent.trim()).toBe('Test Value');
+      const displayElement = fixture.debugElement.query(
+        By.css('.tableng-cell-content')
+      );
+      expect(displayElement.nativeElement.textContent.trim()).toBe(
+        'Test Value'
+      );
     });
 
     it('should apply editable styling when editable is true', () => {
       const cellElement = fixture.debugElement.query(By.css('.tableng-cell'));
-      expect(cellElement.nativeElement.classList).toContain('tableng-cell-editable');
+      expect(cellElement.nativeElement.classList).toContain(
+        'tableng-cell-editable'
+      );
     });
 
     it('should not apply editable styling when editable is false', () => {
@@ -94,7 +107,9 @@ describe('TableCellComponent', () => {
       fixture.detectChanges();
 
       const cellElement = fixture.debugElement.query(By.css('.tableng-cell'));
-      expect(cellElement.nativeElement.classList).not.toContain('tableng-cell-editable');
+      expect(cellElement.nativeElement.classList).not.toContain(
+        'tableng-cell-editable'
+      );
     });
 
     it('should show edit indicator when hovering over editable cell', () => {
@@ -102,7 +117,9 @@ describe('TableCellComponent', () => {
       cellElement.triggerEventHandler('mouseenter', null);
       fixture.detectChanges();
 
-      const editIndicator = fixture.debugElement.query(By.css('.tableng-edit-indicator'));
+      const editIndicator = fixture.debugElement.query(
+        By.css('.tableng-edit-indicator')
+      );
       expect(editIndicator).toBeTruthy();
     });
 
@@ -135,12 +152,15 @@ describe('TableCellComponent', () => {
     it('should use custom formatter when provided', () => {
       component.column = {
         ...mockColumn,
-        formatter: (value: unknown) => typeof value === 'string' ? value.toUpperCase() : String(value)
+        formatter: (value: unknown) =>
+          typeof value === 'string' ? value.toUpperCase() : String(value),
       };
       component.value = 'test value';
       fixture.detectChanges();
 
-      const content = fixture.debugElement.query(By.css('.tableng-cell-content'));
+      const content = fixture.debugElement.query(
+        By.css('.tableng-cell-content')
+      );
       expect(content.nativeElement.textContent.trim()).toBe('TEST VALUE');
     });
   });
@@ -160,7 +180,7 @@ describe('TableCellComponent', () => {
     it('should enter edit mode on Enter key press', () => {
       const cellElement = fixture.debugElement.query(By.css('.tableng-cell'));
       const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
-      
+
       cellElement.triggerEventHandler('keydown', enterEvent);
 
       expect(component.isEditing).toBe(true);
@@ -169,7 +189,7 @@ describe('TableCellComponent', () => {
     it('should enter edit mode on F2 key press', () => {
       const cellElement = fixture.debugElement.query(By.css('.tableng-cell'));
       const f2Event = new KeyboardEvent('keydown', { key: 'F2' });
-      
+
       cellElement.triggerEventHandler('keydown', f2Event);
 
       expect(component.isEditing).toBe(true);
@@ -177,20 +197,20 @@ describe('TableCellComponent', () => {
 
     it('should emit editStart event when entering edit mode', () => {
       let emittedData: unknown;
-      component.editStart.subscribe((data: unknown) => emittedData = data);
+      component.editStart.subscribe((data: unknown) => (emittedData = data));
 
       component.startEdit();
 
       expect(emittedData).toEqual({
         column: mockColumn.key,
         rowIndex: 0,
-        value: 'Test Value'
+        value: 'Test Value',
       });
     });
 
     it('should not enter edit mode when editable is false', () => {
       component.editable = false;
-      
+
       const cellElement = fixture.debugElement.query(By.css('.tableng-cell'));
       cellElement.triggerEventHandler('dblclick', null);
 
@@ -199,7 +219,7 @@ describe('TableCellComponent', () => {
 
     it('should not enter edit mode when readonly is true', () => {
       component.editConfig = { ...mockEditConfig, readonly: true };
-      
+
       const cellElement = fixture.debugElement.query(By.css('.tableng-cell'));
       cellElement.triggerEventHandler('dblclick', null);
 
@@ -225,7 +245,9 @@ describe('TableCellComponent', () => {
     });
 
     it('should render text input in edit mode', () => {
-      const inputElement = fixture.debugElement.query(By.css('input[type="text"]'));
+      const inputElement = fixture.debugElement.query(
+        By.css('input[type="text"]')
+      );
       expect(inputElement).toBeTruthy();
     });
 
@@ -236,9 +258,11 @@ describe('TableCellComponent', () => {
 
     it('should update cellControl when input changes', () => {
       const inputElement = fixture.debugElement.query(By.css('input'));
-      
+
       inputElement.nativeElement.value = 'New Value';
-      inputElement.triggerEventHandler('input', { target: { value: 'New Value' } });
+      inputElement.triggerEventHandler('input', {
+        target: { value: 'New Value' },
+      });
 
       expect(component.cellControl.value).toBe('New Value');
     });
@@ -254,15 +278,19 @@ describe('TableCellComponent', () => {
       component.editConfig = { ...mockEditConfig, required: true };
       (component as any).setupFormControl(); // Re-initialize to apply new config
       fixture.detectChanges();
-      
+
       component.cellControl.setValue('');
       component.cellControl.markAsTouched();
       tick();
       fixture.detectChanges();
 
-      const errorElement = fixture.debugElement.query(By.css('.tableng-validation-error'));
+      const errorElement = fixture.debugElement.query(
+        By.css('.tableng-validation-error')
+      );
       expect(errorElement).toBeTruthy();
-      expect(errorElement.nativeElement.textContent).toContain('This field is required');
+      expect(errorElement.nativeElement.textContent).toContain(
+        'This field is required'
+      );
     }));
 
     it('should show validation error for minLength', fakeAsync(() => {
@@ -275,9 +303,13 @@ describe('TableCellComponent', () => {
       tick();
       fixture.detectChanges();
 
-      const errorElement = fixture.debugElement.query(By.css('.tableng-validation-error'));
+      const errorElement = fixture.debugElement.query(
+        By.css('.tableng-validation-error')
+      );
       expect(errorElement).toBeTruthy();
-      expect(errorElement.nativeElement.textContent).toContain('Minimum length is 5');
+      expect(errorElement.nativeElement.textContent).toContain(
+        'Minimum length is 5'
+      );
     }));
 
     it('should show validation error for pattern', fakeAsync(() => {
@@ -290,9 +322,13 @@ describe('TableCellComponent', () => {
       tick();
       fixture.detectChanges();
 
-      const errorElement = fixture.debugElement.query(By.css('.tableng-validation-error'));
+      const errorElement = fixture.debugElement.query(
+        By.css('.tableng-validation-error')
+      );
       expect(errorElement).toBeTruthy();
-      expect(errorElement.nativeElement.textContent).toContain('Invalid format');
+      expect(errorElement.nativeElement.textContent).toContain(
+        'Invalid format'
+      );
     }));
 
     it('should show custom validation error message', fakeAsync(() => {
@@ -300,10 +336,13 @@ describe('TableCellComponent', () => {
         {
           type: 'custom',
           validator: (value: any) => value !== 'invalid',
-          message: 'Cannot use the word "invalid"'
-        }
+          message: 'Cannot use the word "invalid"',
+        },
       ];
-      component.editConfig = { ...mockEditConfig, validators: customValidators };
+      component.editConfig = {
+        ...mockEditConfig,
+        validators: customValidators,
+      };
       (component as any).setupFormControl();
       fixture.detectChanges();
 
@@ -312,9 +351,13 @@ describe('TableCellComponent', () => {
       tick();
       fixture.detectChanges();
 
-      const errorElement = fixture.debugElement.query(By.css('.tableng-validation-error'));
+      const errorElement = fixture.debugElement.query(
+        By.css('.tableng-validation-error')
+      );
       expect(errorElement).toBeTruthy();
-      expect(errorElement.nativeElement.textContent).toContain('Cannot use the word "invalid"');
+      expect(errorElement.nativeElement.textContent).toContain(
+        'Cannot use the word "invalid"'
+      );
     }));
 
     it('should apply ng-invalid class to input on error', fakeAsync(() => {
@@ -322,7 +365,9 @@ describe('TableCellComponent', () => {
       (component as any).setupFormControl();
       fixture.detectChanges();
 
-      const inputElement = fixture.debugElement.query(By.css('input')).nativeElement;
+      const inputElement = fixture.debugElement.query(
+        By.css('input')
+      ).nativeElement;
       component.cellControl.setValue('');
       component.cellControl.markAsTouched();
       tick();

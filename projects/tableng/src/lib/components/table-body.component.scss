@@ -1,176 +1,180 @@
 .tableng-body {
-      overflow-x: auto;
-      overflow-y: auto;
-      flex: 1;
-      background: #ffffff;
-    }
+  overflow-x: auto;
+  overflow-y: auto;
+  flex: 1;
+  background: #ffffff;
+}
 
-    .tableng-virtual-scroll-container {
-      position: relative;
-      overflow: hidden;
-    }
+.tableng-virtual-scroll-container {
+  position: relative;
+  overflow: hidden;
+}
 
-    .tableng-regular-container {
-      width: 100%;
-    }
+.tableng-regular-container {
+  width: 100%;
+}
 
-    .tableng-row {
-      display: flex;
-      border-bottom: 1px solid #e9ecef;
-      transition: background-color 0.2s ease;
-      cursor: pointer;
-      outline: none;
-    }
+.tableng-row {
+  display: flex;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  outline: none;
+}
 
-    .tableng-row:hover,
-    .tableng-row-hover {
-      background-color: #f8f9fa;
-    }
+.tableng-row:hover,
+.tableng-row-hover {
+  background-color: #f8f9fa;
+}
 
-    .tableng-row-selected {
-      background-color: #e3f2fd !important;
-    }
+.tableng-row-selected {
+  background-color: #e3f2fd !important;
+}
 
-    .tableng-row:focus {
-      outline: 2px solid #007bff;
-      outline-offset: -2px;
-    }
+.tableng-row:focus {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+}
 
-    .tableng-row:focus:not(:focus-visible) {
-      outline: none;
-    }
+.tableng-row:focus:not(:focus-visible) {
+  outline: none;
+}
 
-    .tableng-cell {
-      padding: 12px;
-      border-right: 1px solid #e9ecef;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      position: relative;
-    }
+.tableng-cell {
+  padding: 12px;
+  border-right: 1px solid #e9ecef;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
 
-    .tableng-cell-content {
-      width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+.tableng-cell-content {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-    .tableng-cell-editable {
-      cursor: pointer;
-    }
+.tableng-cell-editable {
+  cursor: pointer;
+}
 
-    .tableng-cell-editable:hover {
-      background-color: #f1f3f4;
-    }
+.tableng-cell-editable:hover {
+  background-color: #f1f3f4;
+}
 
-    .tableng-selection-cell {
-      width: 40px;
-      min-width: 40px;
-      justify-content: center;
-      padding: 8px;
-    }
+.tableng-selection-cell {
+  width: 40px;
+  min-width: 40px;
+  justify-content: center;
+  padding: 8px;
+}
 
-    .tableng-selection-checkbox {
-      cursor: pointer;
-    }
+.tableng-selection-checkbox {
+  cursor: pointer;
+}
 
-    /* Loading State */
-    .tableng-loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 200px;
-      padding: 40px;
-    }
+/* Loading State */
+.tableng-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 40px;
+}
 
-    .tableng-loading-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      color: #6c757d;
-    }
+.tableng-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #6c757d;
+}
 
-    .tableng-loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #e9ecef;
-      border-top: 3px solid #007bff;
-      border-radius: 50%;
-      animation: tableng-spin 1s linear infinite;
-    }
+.tableng-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e9ecef;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: tableng-spin 1s linear infinite;
+}
 
-    .tableng-loading-text {
-      font-size: 14px;
-      font-weight: 500;
-    }
+.tableng-loading-text {
+  font-size: 14px;
+  font-weight: 500;
+}
 
-    @keyframes tableng-spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+@keyframes tableng-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
-    /* Empty State */
-    .tableng-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 200px;
-      padding: 40px;
-    }
+/* Empty State */
+.tableng-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 40px;
+}
 
-    .tableng-empty-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      color: #6c757d;
-      text-align: center;
-    }
+.tableng-empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #6c757d;
+  text-align: center;
+}
 
-    .tableng-empty-icon {
-      font-size: 48px;
-      opacity: 0.5;
-    }
+.tableng-empty-icon {
+  font-size: 48px;
+  opacity: 0.5;
+}
 
-    .tableng-empty-message {
-      font-size: 16px;
-      font-weight: 500;
-    }
+.tableng-empty-message {
+  font-size: 16px;
+  font-weight: 500;
+}
 
-    /* Virtual Scrolling */
-    .tableng-virtual-spacer-top,
-    .tableng-virtual-spacer-bottom {
-      width: 100%;
-      pointer-events: none;
-    }
+/* Virtual Scrolling */
+.tableng-virtual-spacer-top,
+.tableng-virtual-spacer-bottom {
+  width: 100%;
+  pointer-events: none;
+}
 
-    /* Data Type Specific Styling */
-    .tableng-cell-type-number {
-      text-align: right;
-      font-family: 'Courier New', monospace;
-    }
+/* Data Type Specific Styling */
+.tableng-cell-type-number {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
 
-    .tableng-cell-type-boolean {
-      text-align: center;
-    }
+.tableng-cell-type-boolean {
+  text-align: center;
+}
 
-    .tableng-cell-type-date {
-      font-family: 'Courier New', monospace;
-    }
+.tableng-cell-type-date {
+  font-family: 'Courier New', monospace;
+}
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .tableng-cell {
-        padding: 8px;
-        font-size: 14px;
-      }
-      
-      .tableng-selection-cell {
-        width: 32px;
-        min-width: 32px;
-        padding: 4px;
-      }
-    }
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tableng-cell {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .tableng-selection-cell {
+    width: 32px;
+    min-width: 32px;
+    padding: 4px;
+  }
+}

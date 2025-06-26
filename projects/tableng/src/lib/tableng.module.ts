@@ -14,19 +14,15 @@ import { TableCellComponent } from './components/table-cell.component';
     TableHeaderComponent,
     TableBodyComponent,
     TableRowComponent,
-    TableCellComponent
+    TableCellComponent,
   ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule
-  ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   exports: [
     TablengComponent,
     TableHeaderComponent,
     TableBodyComponent,
     TableRowComponent,
-    TableCellComponent
-  ]
+    TableCellComponent,
+  ],
 })
-export class TablengModule { }
+export class TablengModule {}
