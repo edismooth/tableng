@@ -16,13 +16,13 @@
   ],
   "author": "Oskar Gembalski",
   "license": "MIT",
-  "homepage": "https://github.com/oskargembalski/tableng",
+  "homepage": "https://github.com/edismooth/tableng",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/oskargembalski/tableng.git"
+    "url": "git+https://github.com/edismooth/tableng.git"
   },
   "bugs": {
-    "url": "https://github.com/oskargembalski/tableng/issues"
+    "url": "https://github.com/edismooth/tableng/issues"
   },
   "peerDependencies": {
     "@angular/common": "^20.0.0",
